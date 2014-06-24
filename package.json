@@ -1,0 +1,24 @@
+{
+  "name": "carta",
+  "version": "0.0.0",
+  "description": "carta\r =====",
+  "main": "index.js",
+  "dependencies": {
+    "koa": "~0.8.0",
+    "koa-static": "~1.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/davidxcheng/carta.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/davidxcheng/carta/issues"
+  },
+  "homepage": "https://github.com/davidxcheng/carta"
+}
