@@ -1,0 +1,57 @@
+* {
+	box-sizing: border-box;
+}
+body {
+	font: bold 16px arial;
+	background: cyan;
+}
+#main {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+}
+
+.entity {
+	display: flex;
+	border: 4px solid magenta;
+	padding: 8px;
+	margin: 8px;
+	min-width: 120px;
+	max-width: 120px;
+	height: 60px;
+	justify-content:center;
+	align-items: center;
+	border-radius: 3px;
+	background: rgba(0, 255, 0, .8);
+	text-align: center;
+}
+
+#canvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%
+}
+
+.node {
+	stroke: magenta;
+	stroke-width: 4;
+	fill: rgba(0,0,0,.9);
+}
+
+.node-text {
+	font-family: courier;
+	font-weight: normal;
+	stroke: none;
+	fill: lime;
+}
+
+.line {
+	fill: none;
+	stroke: black;
+	stroke-width: 3;
+}

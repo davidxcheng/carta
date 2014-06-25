@@ -1,0 +1,19 @@
+{
+	"nodes": [
+		{
+			"id": "start",
+			"text": "Some Event"
+		},
+		{
+			"id": "member-notifications",
+			"text": "Member Notifications"
+		}
+	],
+	"relations": [
+		{
+			"node1": "start",
+			"node2": "member-notifications",
+			"text": ""
+		}
+	]
+}
