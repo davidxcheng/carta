@@ -1,4 +1,5 @@
-var svgNameSpace = "http://www.w3.org/2000/svg";
+var svgNameSpace = "http://www.w3.org/2000/svg",
+	drag = require("./drag");
 
 function createSvgRepresentationOfNode(node) {
 	var frag 	= document.createDocumentFragment(),
@@ -21,11 +22,13 @@ function createSvgRepresentationOfNode(node) {
 	group.appendChild(text);
 
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
+	drag(group);
 
 	frag.appendChild(group);
 
 	return frag;
 }
+
 
 module.exports = {
 	version: "0.0",
