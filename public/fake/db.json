@@ -2,11 +2,19 @@
 	"nodes": [
 		{
 			"id": "start",
-			"text": "Some Event"
+			"text": "Some Event",
+			"position": {
+				"x": 10,
+				"y": 10
+			}
 		},
 		{
 			"id": "member-notifications",
-			"text": "Member Notifications"
+			"text": "Member Notifications",
+			"position": {
+				"x": 10,
+				"y": 110
+			}
 		}
 	],
 	"relations": [

@@ -8,7 +8,10 @@
     "koa-static": "~1.4.5",
     "superagent": "^0.18.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "browserify": "~4.2",
+    "watchify": "^0.10.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

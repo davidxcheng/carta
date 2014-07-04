@@ -1241,10 +1241,54 @@ module.exports = function(arr, fn, initial){
   return curr;
 };
 },{}],4:[function(require,module,exports){
-var request = require('superagent'),
+var svgNameSpace = "http://www.w3.org/2000/svg";
+
+function createSvgRepresentationOfNode(node) {
+	var frag 	= document.createDocumentFragment(),
+		group 	= document.createElementNS(svgNameSpace, "g"),
+		rect 	= document.createElementNS(svgNameSpace, "rect"),
+		text	= document.createElementNS(svgNameSpace, "text");
+
+	rect.classList.add("node");
+	rect.setAttribute("width", "120");
+	rect.setAttribute("height", "60");
+	rect.setAttribute("rx", "3");
+	rect.setAttribute("ry", "3");
+
+	text.classList.add("node-text");
+	text.setAttribute("x", "12");
+	text.setAttribute("y", "34");
+	text.textContent = node.text;
+
+	group.appendChild(rect);
+	group.appendChild(text);
+
+	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
+
+	frag.appendChild(group);
+
+	return frag;
+}
+
+module.exports = {
+	version: "0.0",
+	createSvgNode: createSvgRepresentationOfNode
+};
+},{}],5:[function(require,module,exports){
+var carta = require('./carta'),
+	request = require('superagent'),
 	db = {};
 
-request.get('fake/db.json', function(data) {
-	db = data;
+request.get('fake/db.json', function(res) {
+	db = JSON.parse(res.text);
+
+	var child = carta.createSvgNode(db.nodes[0]);
+
+	db.nodes.forEach(function(n) {
+		canvas.appendChild(carta.createSvgNode(n));
+	});
+
 });
-},{"superagent":1}]},{},[4])
+
+
+},{"./carta":4,"superagent":1}]},{},[5])

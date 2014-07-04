@@ -1,6 +1,15 @@
-var request = require('superagent'),
+var carta = require('./carta'),
+	request = require('superagent'),
 	db = {};
 
-request.get('fake/db.json', function(data) {
-	db = data;
+request.get('fake/db.json', function(res) {
+	db = JSON.parse(res.text);
+
+	var child = carta.createSvgNode(db.nodes[0]);
+
+	db.nodes.forEach(function(n) {
+		canvas.appendChild(carta.createSvgNode(n));
+	});
+
 });
+
