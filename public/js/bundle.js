@@ -1265,7 +1265,9 @@ function createSvgRepresentationOfNode(node) {
 	group.appendChild(text);
 
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
-	drag(group);
+	drag(group, function(coords) {
+		console.dir(coords);
+	});
 
 	frag.appendChild(group);
 
@@ -1278,7 +1280,7 @@ module.exports = {
 	createSvgNode: createSvgRepresentationOfNode
 };
 },{"./drag":5}],5:[function(require,module,exports){
-module.exports = function(el) {
+module.exports = function(el, onDragEnd) {
 	var elCoords = {
 			x: 0,
 			y: 0
@@ -1289,7 +1291,7 @@ module.exports = function(el) {
 		};
 
 	el.addEventListener("mousedown", function(e) {
-		elCoords = getTranslateValues(el.getAttribute("transform"));
+		elCoords = getTranslateValues(el);
 		dragCoords.x = e.clientX;
 		dragCoords.y = e.clientY;
 
@@ -1298,6 +1300,9 @@ module.exports = function(el) {
 
 	el.addEventListener("mouseup", function(e) {
 		el.removeEventListener("mousemove", moveTarget);
+
+		if (onDragEnd)
+			onDragEnd(getTranslateValues(el));
 	});
 
 	var moveTarget = function(e) {
@@ -1320,9 +1325,14 @@ module.exports = function(el) {
 * Returns the x and y values from a css translate function.
 * @example
 * // returns { x: 10, y: 90 }
-* getTranslateValues("translate(10, 90)") 
+* if el.getAttribute("transform") returns "translate(10, 90)" 
 */
-function getTranslateValues(str) {
+function getTranslateValues(el) {
+	var str = el.getAttribute("transform");
+
+	if (str.length < 14 || str.slice(0, 10) != "translate(")
+		return { x: 0, y: 0 };
+
 	var values = str.slice(10, -1).split(" ");
 
 	return {

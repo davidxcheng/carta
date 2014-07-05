@@ -22,7 +22,9 @@ function createSvgRepresentationOfNode(node) {
 	group.appendChild(text);
 
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
-	drag(group);
+	drag(group, function(coords) {
+		console.dir(coords);
+	});
 
 	frag.appendChild(group);
 
