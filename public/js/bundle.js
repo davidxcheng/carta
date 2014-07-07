@@ -1281,7 +1281,8 @@ module.exports = {
 };
 },{"./drag":5}],5:[function(require,module,exports){
 module.exports = function(el, onDragEnd) {
-	var elCoords = {
+	var xy = require("./xy"),
+		elCoords = {
 			x: 0,
 			y: 0
 		},
@@ -1291,21 +1292,21 @@ module.exports = function(el, onDragEnd) {
 		};
 
 	el.addEventListener("mousedown", function(e) {
-		elCoords = getTranslateValues(el);
+		elCoords = xy(el);
 		dragCoords.x = e.clientX;
 		dragCoords.y = e.clientY;
 
-		el.addEventListener("mousemove", moveTarget);
+		el.addEventListener("mousemove", move);
 	});
 
 	el.addEventListener("mouseup", function(e) {
-		el.removeEventListener("mousemove", moveTarget);
+		el.removeEventListener("mousemove", move);
 
 		if (onDragEnd)
-			onDragEnd(getTranslateValues(el));
+			onDragEnd(xy(el));
 	});
 
-	var moveTarget = function(e) {
+	var move = function(e) {
 		var sideways = e.clientX - dragCoords.x,
 			vert = e.clientY - dragCoords.y;
 		
@@ -1320,27 +1321,7 @@ module.exports = function(el, onDragEnd) {
 		dragCoords.y = e.clientY;
 	};
 };
-
-/** 
-* Returns the x and y values from a css translate function.
-* @example
-* // returns { x: 10, y: 90 }
-* if el.getAttribute("transform") returns "translate(10, 90)" 
-*/
-function getTranslateValues(el) {
-	var str = el.getAttribute("transform");
-
-	if (str.length < 14 || str.slice(0, 10) != "translate(")
-		return { x: 0, y: 0 };
-
-	var values = str.slice(10, -1).split(" ");
-
-	return {
-		x: parseInt(values[0]),
-		y: parseInt(values[1])
-	};
-}
-},{}],6:[function(require,module,exports){
+},{"./xy":7}],6:[function(require,module,exports){
 var carta = require('./carta'),
 	request = require('superagent'),
 	db = {};
@@ -1357,4 +1338,24 @@ request.get('fake/db.json', function(res) {
 });
 
 
-},{"./carta":4,"superagent":1}]},{},[6])
+},{"./carta":4,"superagent":1}],7:[function(require,module,exports){
+/** 
+* Returns the x and y values from a css translate function.
+* @example
+* // returns { x: 10, y: 90 }
+* // when el.getAttribute("transform") yields "translate(10, 90)" 
+*/
+module.exports = function getTranslateValues(el) {
+	var str = el.getAttribute("transform");
+
+	if (str.length < 14 || str.slice(0, 10) != "translate(")
+		return { x: 0, y: 0 };
+
+	var values = str.slice(10, -1).split(" ");
+
+	return {
+		x: parseInt(values[0]),
+		y: parseInt(values[1])
+	};
+}
+},{}]},{},[6])
