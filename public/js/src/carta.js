@@ -21,6 +21,7 @@ function createSvgRepresentationOfNode(node) {
 	group.appendChild(rect);
 	group.appendChild(text);
 
+	group.setAttribute("data-node-id", node.id);
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
 	drag(group);
 

@@ -12,6 +12,17 @@ request.get('fake/db.json', function(res) {
 	});
 });
 
-canvas.addEventListener("ui-drag-ended", function(e) {
-	console.dir(e);
+canvas.addEventListener("ui-drag-end", function(e) {
+	request
+		.patch("nodes/" + e.detail.nodeId)
+		.send([
+			{
+				op: "replace",
+				path: "/position",
+				value: e.detail.position
+			}
+		])
+		.end(function(err, res) {
+			console.dir(res);
+		})
 });

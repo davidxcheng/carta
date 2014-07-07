@@ -1,19 +1,12 @@
 module.exports = function(el) {
 	var xy = require("./xy"),
-		elCoords = {
-			x: 0,
-			y: 0
-		},
-		dragCoords = {
-			x: 0,
-			y: 0
-		},
+		elCoords = { x: 0, y: 0 }, 
+		dragCoords = { x: 0, y: 0 },
 		_dragging = false;
 
 	el.addEventListener("mousedown", function(e) {
 		elCoords = xy(el);
-		dragCoords.x = e.clientX;
-		dragCoords.y = e.clientY;
+		dragCoords = xy(e);
 
 		el.addEventListener("mousemove", move);
 	});
@@ -22,9 +15,10 @@ module.exports = function(el) {
 		el.removeEventListener("mousemove", move);
 
 		if (_dragging) {
-			el.dispatchEvent(new CustomEvent("ui-drag-ended", {
+			el.dispatchEvent(new CustomEvent("ui-drag-end", {
 				bubbles: true,
 				detail: {
+					nodeId: el.dataset.nodeId,
 					position: xy(el)
 				}
 			}));
@@ -36,17 +30,16 @@ module.exports = function(el) {
 	var move = function(e) {
 		_dragging = true;
 
-		var sideways = e.clientX - dragCoords.x,
-			vert = e.clientY - dragCoords.y;
+		var deltaX = e.clientX - dragCoords.x, 
+			deltaY = e.clientY - dragCoords.y;
 		
-		elCoords.x += sideways;
-		elCoords.y += vert;
+		elCoords.x += deltaX;
+		elCoords.y += deltaY;
 
 		el.setAttribute("transform", "translate(" 
 			+ elCoords.x + ", " 
 			+ elCoords.y + ")");
 
-		dragCoords.x = e.clientX;
-		dragCoords.y = e.clientY;
+		dragCoords = xy(e);
 	};
 };

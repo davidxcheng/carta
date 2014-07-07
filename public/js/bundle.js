@@ -1264,6 +1264,7 @@ function createSvgRepresentationOfNode(node) {
 	group.appendChild(rect);
 	group.appendChild(text);
 
+	group.setAttribute("data-node-id", node.id);
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
 	drag(group);
 
@@ -1280,20 +1281,13 @@ module.exports = {
 },{"./drag":5}],5:[function(require,module,exports){
 module.exports = function(el) {
 	var xy = require("./xy"),
-		elCoords = {
-			x: 0,
-			y: 0
-		},
-		dragCoords = {
-			x: 0,
-			y: 0
-		},
+		elCoords = { x: 0, y: 0 }, 
+		dragCoords = { x: 0, y: 0 },
 		_dragging = false;
 
 	el.addEventListener("mousedown", function(e) {
 		elCoords = xy(el);
-		dragCoords.x = e.clientX;
-		dragCoords.y = e.clientY;
+		dragCoords = xy(e);
 
 		el.addEventListener("mousemove", move);
 	});
@@ -1302,9 +1296,10 @@ module.exports = function(el) {
 		el.removeEventListener("mousemove", move);
 
 		if (_dragging) {
-			el.dispatchEvent(new CustomEvent("ui-drag-ended", {
+			el.dispatchEvent(new CustomEvent("ui-drag-end", {
 				bubbles: true,
 				detail: {
+					nodeId: el.dataset.nodeId,
 					position: xy(el)
 				}
 			}));
@@ -1316,18 +1311,17 @@ module.exports = function(el) {
 	var move = function(e) {
 		_dragging = true;
 
-		var sideways = e.clientX - dragCoords.x,
-			vert = e.clientY - dragCoords.y;
+		var deltaX = e.clientX - dragCoords.x, 
+			deltaY = e.clientY - dragCoords.y;
 		
-		elCoords.x += sideways;
-		elCoords.y += vert;
+		elCoords.x += deltaX;
+		elCoords.y += deltaY;
 
 		el.setAttribute("transform", "translate(" 
 			+ elCoords.x + ", " 
 			+ elCoords.y + ")");
 
-		dragCoords.x = e.clientX;
-		dragCoords.y = e.clientY;
+		dragCoords = xy(e);
 	};
 };
 },{"./xy":7}],6:[function(require,module,exports){
@@ -1345,19 +1339,45 @@ request.get('fake/db.json', function(res) {
 	});
 });
 
-canvas.addEventListener("ui-drag-ended", function(e) {
+canvas.addEventListener("ui-drag-end", function(e) {
 	console.dir(e);
+	request
+		.patch("nodes/" + e.detail.nodeId)
+		.send([
+			{
+				replace: "/position",
+				value: e.detail.position
+			}
+		])
+		.end(function(err, res) {
+			console.dir(res);
+		})
 });
 },{"./carta":4,"superagent":1}],7:[function(require,module,exports){
 /** 
-* Returns the x and y values from a css translate function.
-* @example
-* // returns { x: 10, y: 90 }
-* // when el.getAttribute("transform") yields "translate(10, 90)" 
+* Returns the x and y values from a MouseEvent or a svg group element (that gets 
+* its position via a css translate function).
 */
-module.exports = function getTranslateValues(el) {
+module.exports = function(obj) {
+	// TODO: constructor.name is a ES6 feature currently not supported by IE
+	var ctor = obj.constructor.name;
+
+	if (ctor == "MouseEvent") {
+		return {
+			x: obj.clientX,
+			y: obj.clientY
+		}
+	}
+
+	if (ctor == "SVGGElement") {
+		return getTranslateValues(obj);
+	}
+}
+
+function getTranslateValues(el) {
 	var str = el.getAttribute("transform");
 
+	// Return zeros if no transalate function can be found.
 	if (str.length < 14 || str.slice(0, 10) != "translate(")
 		return { x: 0, y: 0 };
 

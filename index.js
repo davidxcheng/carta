@@ -1,5 +1,13 @@
 var koa = require('koa'),
-	serve = require('koa-static');
+	route = require('koa-route'),
+	serve = require('koa-static'),
+	app = koa();
 
-koa().use(serve(__dirname + '/public')).listen(8999);
+app.use(serve(__dirname + '/public'));
+app.use(route.patch('/nodes/:id', function *patchNode(id) {
+	console.log(id);
+	this.body = "OK";
+}));
+app.listen(8999);
+
 console.log('listening on port 8999..');
