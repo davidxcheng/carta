@@ -10,6 +10,8 @@ request.get('fake/db.json', function(res) {
 	db.nodes.forEach(function(n) {
 		canvas.appendChild(carta.createSvgNode(n));
 	});
-
 });
 
+canvas.addEventListener("ui-drag-ended", function(e) {
+	console.dir(e);
+});

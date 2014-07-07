@@ -1265,9 +1265,7 @@ function createSvgRepresentationOfNode(node) {
 	group.appendChild(text);
 
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
-	drag(group, function(coords) {
-		console.dir(coords);
-	});
+	drag(group);
 
 	frag.appendChild(group);
 
@@ -1280,7 +1278,7 @@ module.exports = {
 	createSvgNode: createSvgRepresentationOfNode
 };
 },{"./drag":5}],5:[function(require,module,exports){
-module.exports = function(el, onDragEnd) {
+module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = {
 			x: 0,
@@ -1301,9 +1299,12 @@ module.exports = function(el, onDragEnd) {
 
 	el.addEventListener("mouseup", function(e) {
 		el.removeEventListener("mousemove", move);
-
-		if (onDragEnd)
-			onDragEnd(xy(el));
+		el.dispatchEvent(new CustomEvent("ui-drag-ended", {
+			bubbles: true,
+			detail: {
+				position: xy(el)
+			}
+		}));
 	});
 
 	var move = function(e) {
@@ -1334,10 +1335,11 @@ request.get('fake/db.json', function(res) {
 	db.nodes.forEach(function(n) {
 		canvas.appendChild(carta.createSvgNode(n));
 	});
-
 });
 
-
+canvas.addEventListener("ui-drag-ended", function(e) {
+	console.dir(e);
+});
 },{"./carta":4,"superagent":1}],7:[function(require,module,exports){
 /** 
 * Returns the x and y values from a css translate function.

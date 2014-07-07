@@ -1,4 +1,4 @@
-module.exports = function(el, onDragEnd) {
+module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = {
 			x: 0,
@@ -19,9 +19,12 @@ module.exports = function(el, onDragEnd) {
 
 	el.addEventListener("mouseup", function(e) {
 		el.removeEventListener("mousemove", move);
-
-		if (onDragEnd)
-			onDragEnd(xy(el));
+		el.dispatchEvent(new CustomEvent("ui-drag-ended", {
+			bubbles: true,
+			detail: {
+				position: xy(el)
+			}
+		}));
 	});
 
 	var move = function(e) {
