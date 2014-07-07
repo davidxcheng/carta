@@ -7,7 +7,8 @@ module.exports = function(el) {
 		dragCoords = {
 			x: 0,
 			y: 0
-		};
+		},
+		_dragging = false;
 
 	el.addEventListener("mousedown", function(e) {
 		elCoords = xy(el);
@@ -19,15 +20,22 @@ module.exports = function(el) {
 
 	el.addEventListener("mouseup", function(e) {
 		el.removeEventListener("mousemove", move);
-		el.dispatchEvent(new CustomEvent("ui-drag-ended", {
-			bubbles: true,
-			detail: {
-				position: xy(el)
-			}
-		}));
+
+		if (_dragging) {
+			el.dispatchEvent(new CustomEvent("ui-drag-ended", {
+				bubbles: true,
+				detail: {
+					position: xy(el)
+				}
+			}));
+
+			_dragging = false;
+		}
 	});
 
 	var move = function(e) {
+		_dragging = true;
+
 		var sideways = e.clientX - dragCoords.x,
 			vert = e.clientY - dragCoords.y;
 		
