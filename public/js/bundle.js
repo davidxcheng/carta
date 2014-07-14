@@ -1340,12 +1340,12 @@ request.get('fake/db.json', function(res) {
 });
 
 canvas.addEventListener("ui-drag-end", function(e) {
-	console.dir(e);
 	request
 		.patch("nodes/" + e.detail.nodeId)
 		.send([
 			{
-				replace: "/position",
+				op: "replace",
+				path: "/position",
 				value: e.detail.position
 			}
 		])

@@ -6,6 +6,9 @@ var koa = require('koa'),
 app.use(serve(__dirname + '/public'));
 app.use(route.patch('/nodes/:id', function *patchNode(id) {
 	console.log(id);
+	// get db
+	// get node from db
+	// apply patch
 	this.body = "OK";
 }));
 app.listen(8999);
