@@ -2,7 +2,7 @@
 	"nodes": [
 		{
 			"id": "start",
-			"text": "Some Event",
+			"text": "Event",
 			"position": {
 				"x": 10,
 				"y": 90
