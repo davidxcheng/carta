@@ -1,20 +1,11 @@
 var koa = require('koa'),
-	route = require('koa-route'),
 	serve = require('koa-static'),
-	parse = require('co-body'),
-	dal = require('./srv/dal')('srv/db.json'),
+	config = require('./config.js'),
+	router = require('./srv/router'),
 	app = koa();
 
 app.use(serve(__dirname + '/public'));
-app.use(route.get('/fake/db', function* () {
-	// return entire db
-	this.body = dal.all();
-}));
-app.use(route.patch('/nodes/:id', function* (id) {
-	var patch = yield parse(this);
-	dal.patchNode(id, patch);
-	this.body = "OK";
-}));
-app.listen(8999);
+router(app);
+app.listen(config.port);
 
-console.log('listening on port 8999..');
+console.log('listening on port %s..', config.port);
