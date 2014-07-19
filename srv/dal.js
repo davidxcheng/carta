@@ -3,6 +3,10 @@ module.exports = function(filename) {
 		jsonpatch = require('json-patch'),
 		db = JSON.parse(fs.readFileSync(filename, { encoding: 'utf8' }));
 
+	function save() {
+		fs.writeFileSync(filename, JSON.stringify(db));
+	}
+
 	return {
 		all: function() {
 			return db;
@@ -16,6 +20,8 @@ module.exports = function(filename) {
 				throw "Could not find node with id '" + id + "'."
 
 			jsonpatch.apply(db.nodes[i], patch);
+
+			save();
 		}
 	};
 };
