@@ -14,10 +14,13 @@ body {
 	height: 100%;
 }
 
+g { transition: transform .3s; }
+
 .node {
 	stroke: magenta;
 	stroke-width: 4;
 	fill: rgba(0,0,0,.9);
+
 }
 
 .node-text {
@@ -31,4 +34,9 @@ body {
 	fill: none;
 	stroke: black;
 	stroke-width: 3;
+}
+
+.grabbed {
+	cursor: -webkit-grabbing;
+	cursor: grabbing;
 }

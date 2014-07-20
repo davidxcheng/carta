@@ -8,6 +8,7 @@ module.exports = function(el) {
 		elCoords = xy(el);
 		dragCoords = xy(e);
 
+		el.classList.add("grabbed");
 		el.addEventListener("mousemove", move);
 	});
 
@@ -25,6 +26,8 @@ module.exports = function(el) {
 
 			_dragging = false;
 		}
+
+		el.classList.remove("grabbed");
 	});
 
 	var move = function(e) {

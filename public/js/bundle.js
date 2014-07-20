@@ -1266,6 +1266,8 @@ function createSvgRepresentationOfNode(node) {
 
 	group.setAttribute("data-node-id", node.id);
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
+
+	// Make element draggable
 	drag(group);
 
 	frag.appendChild(group);
@@ -1289,6 +1291,7 @@ module.exports = function(el) {
 		elCoords = xy(el);
 		dragCoords = xy(e);
 
+		el.classList.add("grabbed");
 		el.addEventListener("mousemove", move);
 	});
 
@@ -1306,6 +1309,8 @@ module.exports = function(el) {
 
 			_dragging = false;
 		}
+
+		el.classList.remove("grabbed");
 	});
 
 	var move = function(e) {

@@ -23,6 +23,8 @@ function createSvgRepresentationOfNode(node) {
 
 	group.setAttribute("data-node-id", node.id);
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
+
+	// Make element draggable
 	drag(group);
 
 	frag.appendChild(group);
