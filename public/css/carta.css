@@ -14,7 +14,7 @@ body {
 	height: 100%;
 }
 
-g { transition: transform .3s; }
+g { cursor: pointer; }
 
 .node {
 	stroke: magenta;
