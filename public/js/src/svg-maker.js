@@ -32,8 +32,6 @@ function createSvgRepresentationOfNode(node) {
 	return frag;
 }
 
-
 module.exports = {
-	version: "0.0",
 	createSvgNode: createSvgRepresentationOfNode
 };
