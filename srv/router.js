@@ -26,4 +26,8 @@ module.exports = function(srv) {
 		this.body = "OK";
 	}));
 
+	// DELETE /nodes/{id}
+	srv.use(route.delete('/nodes/:id'), function* (id) {
+		dal.removeNode(id);
+	});
 };

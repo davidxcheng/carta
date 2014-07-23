@@ -26,6 +26,14 @@ module.exports = function(filename) {
 			jsonpatch.apply(db.nodes[i], patch);
 
 			save();
+		},
+		removeNode: function(id) {
+			var index = db.nodes.findIndex(function(node) {
+				return node.id == id;
+			});
+
+			db.nodes.splice(index, 1);
+			save();
 		}
 	};
 };
