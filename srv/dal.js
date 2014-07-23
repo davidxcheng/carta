@@ -11,6 +11,10 @@ module.exports = function(filename) {
 		all: function() {
 			return db;
 		},
+		addNode: function(node) {
+			db.nodes.push(node);
+			save();
+		},
 		patchNode: function(id, patch) {
 			var i = db.nodes.findIndex(function(node) {
 				return node.id == id;

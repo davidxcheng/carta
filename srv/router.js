@@ -11,6 +11,14 @@ module.exports = function(srv) {
 		this.body = dal.all();
 	}));
 
+	// POST
+	srv.use(route.post('/nodes', function* () {
+		var node = yield parse(this);
+		console.dir(node);
+		dal.addNode(node);
+		this.body = "OK";
+	}));
+
 	// PATCH /nodes/{id}
 	srv.use(route.patch('/nodes/:id', function* (id) {
 		var patch = yield parse(this);

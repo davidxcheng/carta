@@ -5,8 +5,6 @@ var svgMaker = require('./svg-maker'),
 	uuid = require('uuid'),
 	db = {};
 
-	console.dir(uuid);
-
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
 
@@ -27,7 +25,7 @@ canvas.addEventListener("ui-drag-end", function(e) {
 		])
 		.end(function(err, res) {
 			//console.dir(res);
-		})
+		});
 });
 
 canvas.addEventListener("dblclick", function(e) {
@@ -35,10 +33,17 @@ canvas.addEventListener("dblclick", function(e) {
 	if (this == e.target) {
 		var origo = xy(e);
 
-		canvas.appendChild(svgMaker.createSvgNode({
+		var node = {
 			id: uuid.v4(),
 			text: "",
 			position: origo
-		}));
+		}
+
+		db.nodes.push(node);
+		request
+			.post("nodes/")
+			.send(node)
+			.end(function(err, res){});
+		canvas.appendChild(svgMaker.createSvgNode(node));
 	}
 });
