@@ -5,6 +5,8 @@ var svgMaker = require('./svg-maker'),
 	uuid = require('uuid'),
 	db = {};
 
+var currentNode = null;
+
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
 
@@ -45,5 +47,18 @@ canvas.addEventListener("dblclick", function(e) {
 			.send(node)
 			.end(function(err, res){});
 		canvas.appendChild(svgMaker.createSvgNode(node));
+	}
+});
+
+canvas.addEventListener("click", function(e) {
+	console.clear();
+	if (e.target.parentNode.dataset.nodeId) {
+		// TODO: clear event listeners from current node.
+		console.dir(currentNode);
+		if (currentNode) {
+			currentNode.classList.remove("active");
+		}
+		currentNode = e.target.parentNode;
+		currentNode.classList.add("active");
 	}
 });

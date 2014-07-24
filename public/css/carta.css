@@ -23,6 +23,10 @@ g { cursor: pointer; }
 
 }
 
+g.active .node {
+	stroke: yellow;
+}
+
 .node-text {
 	font-family: courier;
 	font-weight: normal;
