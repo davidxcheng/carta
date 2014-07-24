@@ -1,6 +1,5 @@
 var route = require('koa-route'),
 	parse = require('co-body'),
-	HttpStatus = require('http-status-codes'),
 	config = require('../config.js'),
 	dal = require('../srv/dal')(config.connectionString);
 
@@ -15,7 +14,6 @@ module.exports = function(srv) {
 	// POST /nodes
 	srv.use(route.post('/nodes', function* () {
 		var node = yield parse(this);
-		console.dir(node);
 		dal.addNode(node);
 		this.body = "OK";
 	}));
@@ -30,7 +28,7 @@ module.exports = function(srv) {
 	// DELETE /nodes/{id}
 	srv.use(route.del('/nodes/:id', function* (id) {
 		dal.removeNode(id);
-		this.body = "OK";
-		this.response.statusCode = HttpStatus.Accepted;
+		this.response.body = "ACCEPTED";
+		this.response.status = 202;
 	}));
 };
