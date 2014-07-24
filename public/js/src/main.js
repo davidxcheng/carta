@@ -5,7 +5,7 @@ var svgMaker = require('./svg-maker'),
 	uuid = require('uuid'),
 	db = {};
 
-var currentNode = null;
+var activeNode = null;
 
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
@@ -53,12 +53,32 @@ canvas.addEventListener("dblclick", function(e) {
 canvas.addEventListener("click", function(e) {
 	console.clear();
 	if (e.target.parentNode.dataset.nodeId) {
-		// TODO: clear event listeners from current node.
-		console.dir(currentNode);
-		if (currentNode) {
-			currentNode.classList.remove("active");
+		// TODO: clear event listeners from active node.
+		if (activeNode) {
+			activeNode.classList.remove("active");
 		}
-		currentNode = e.target.parentNode;
-		currentNode.classList.add("active");
+		activeNode = e.target.parentNode;
+		activeNode.classList.add("active");
 	}
 });
+
+document.getElementsByTagName("body")[0]
+	.addEventListener("keydown", function(e) {
+
+		switch (e.keyCode) {
+			case 46: //delete
+				if (activeNode) {
+					request
+						.del('nodes/' + activeNode.dataset.nodeId)
+						.end(function(err, res) {
+							if (err) 
+								return;
+
+							// TODO: clear all refs to active node.
+							// 		 and update db
+							activeNode.parentNode.removeChild(activeNode);
+						});
+				}
+				break;
+		}
+	});

@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "co-body": "0.0.2",
+    "http-status-codes": "^1.0.2",
     "json-patch": "^0.4.3",
     "koa": "~0.8.0",
     "koa-route": "^1.1.4",
