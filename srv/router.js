@@ -30,7 +30,7 @@ module.exports = function(srv) {
 	// DELETE /nodes/{id}
 	srv.use(route.del('/nodes/:id', function* (id) {
 		dal.removeNode(id);
-		this.body = "OKI";
+		this.body = "OK";
 		this.response.statusCode = HttpStatus.Accepted;
 	}));
 };

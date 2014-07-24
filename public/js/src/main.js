@@ -47,38 +47,44 @@ canvas.addEventListener("dblclick", function(e) {
 			.send(node)
 			.end(function(err, res){});
 		canvas.appendChild(svgMaker.createSvgNode(node));
+		setActiveNode(canvas.lastChild);
 	}
 });
 
 canvas.addEventListener("click", function(e) {
-	console.clear();
 	if (e.target.parentNode.dataset.nodeId) {
-		// TODO: clear event listeners from active node.
-		if (activeNode) {
-			activeNode.classList.remove("active");
-		}
-		activeNode = e.target.parentNode;
-		activeNode.classList.add("active");
+		setActiveNode(e.target.parentNode);
 	}
 });
 
-document.getElementsByTagName("body")[0]
-	.addEventListener("keydown", function(e) {
+body.addEventListener("keydown", function(e) {
+	switch (e.keyCode) {
+		case 46: //delete
+			if (activeNode) {
+				request
+					.del("nodes/" + activeNode.dataset.nodeId)
+					.end(function(err, res) {
+						if (err) 
+							throw "Error when deleting node";
 
-		switch (e.keyCode) {
-			case 46: //delete
-				if (activeNode) {
-					request
-						.del('nodes/' + activeNode.dataset.nodeId)
-						.end(function(err, res) {
-							if (err) 
-								return;
+						// TODO: clear all refs to active node.
+						var index = db.nodes.indexOf(activeNode.dataset.nodeId);
 
-							// TODO: clear all refs to active node.
-							// 		 and update db
-							activeNode.parentNode.removeChild(activeNode);
-						});
-				}
-				break;
-		}
-	});
+						db.nodes.splice(index, 1);
+						activeNode.parentNode.removeChild(activeNode);
+						activeNode = null;
+					});
+			}
+			break;
+	}
+});
+
+function setActiveNode(node) {
+	// TODO: clear event listeners from current active node.
+	if (activeNode) {
+		activeNode.classList.remove("active");
+	}
+
+	activeNode = node;
+	node.classList.add("active");
+}
