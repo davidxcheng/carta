@@ -19,7 +19,7 @@ module.exports = function(srv) {
 	}));
 
 	// PATCH /nodes/{id}
-	srv.use(route.patch('/nodes/:id', function* () {
+	srv.use(route.patch('/nodes/:id', function* (id) {
 		var patch = yield parse(this);
 		dal.patchNode(id, patch);
 		this.body = "OK";

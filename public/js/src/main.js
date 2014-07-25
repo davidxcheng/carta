@@ -5,7 +5,7 @@ var svgMaker = require('./svg-maker'),
 	uuid = require('uuid'),
 	db = {};
 
-var activeNode = null;
+var activeNodes = [];
 
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
@@ -52,39 +52,53 @@ canvas.addEventListener("dblclick", function(e) {
 });
 
 canvas.addEventListener("click", function(e) {
+	console.clear();
+	console.dir(e);
+
+	// Check if a node was clicked
 	if (e.target.parentNode.dataset.nodeId) {
-		setActiveNode(e.target.parentNode);
+		if (e.shiftKey)
+			addActiveNode(e.target.parentNode);
+		else
+			setActiveNode(e.target.parentNode);
 	}
 });
 
 body.addEventListener("keydown", function(e) {
 	switch (e.keyCode) {
 		case 46: //delete
-			if (activeNode) {
+			activeNodes.forEach(function(node) {
 				request
-					.del("nodes/" + activeNode.dataset.nodeId)
+					.del("nodes/" + node.dataset.nodeId)
 					.end(function(err, res) {
 						if (err) 
-							throw "Error when deleting node";
+							throw "Error when deleting node with id " + node.dataset.nodeId;
 
 						// TODO: clear all refs to active node.
-						var index = db.nodes.indexOf(activeNode.dataset.nodeId);
+						var index = db.nodes.indexOf(node.dataset.nodeId);
 
 						db.nodes.splice(index, 1);
-						activeNode.parentNode.removeChild(activeNode);
-						activeNode = null;
+						node.parentNode.removeChild(node);
 					});
-			}
+			});
+			activeNodes.length = 0;
 			break;
 	}
 });
 
 function setActiveNode(node) {
 	// TODO: clear event listeners from current active node.
-	if (activeNode) {
-		activeNode.classList.remove("active");
-	}
+	activeNodes.forEach(function(n) {
+		n.classList.remove("active");		
+	});
 
-	activeNode = node;
+	activeNodes.length = 0;
+
+	activeNodes.push(node);
+	node.classList.add("active");
+}
+
+function addActiveNode(node) {
+	activeNodes.push(node);
 	node.classList.add("active");
 }
