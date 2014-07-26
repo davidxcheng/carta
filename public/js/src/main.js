@@ -1,14 +1,16 @@
 var svgMaker = require('./svg-maker'),
 	request = require('superagent'),
 	xy = require('./xy'),
-	core = require('./core'),
 	uuid = require('uuid'),
+	model = require('./model'),
 	db = {};
 
 var activeNodes = [];
 
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
+
+	model.init(db);
 
 	db.nodes.forEach(function(n) {
 		canvas.appendChild(svgMaker.createSvgNode(n));
@@ -52,15 +54,19 @@ canvas.addEventListener("dblclick", function(e) {
 });
 
 canvas.addEventListener("click", function(e) {
-	console.clear();
-	console.dir(e);
-
 	// Check if a node was clicked
 	if (e.target.parentNode.dataset.nodeId) {
 		if (e.shiftKey)
 			addActiveNode(e.target.parentNode);
-		else
+		else {
+			document.dispatchEvent(new CustomEvent("ui-set-active-node", {
+				detail: {
+					nodeId: e.target.parentNode.dataset.nodeId
+				}
+			}));
+
 			setActiveNode(e.target.parentNode);
+		}
 	}
 });
 

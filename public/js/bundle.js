@@ -1,4 +1,274 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
+"WeakMap" in this || (function (module) {"use strict";
+
+  //!(C) WebReflection - Mit Style License
+  // size and performances oriented polyfill for ES6
+  // WeakMap, Map, and Set
+  // compatible with node.js, Rhino, any browser
+  // does not implement default vaule during wm.get()
+  // since ES.next won't probably do that
+  // use wm.has(o) ? wm.get(o) : d3fault; instead
+
+  // WeakMap(void):WeakMap
+  function WeakMap() {
+
+    // private references holders
+    var
+      keys = [],
+      values = []
+    ;
+
+    // returns freshly new created
+    // instanceof WeakMap in any case
+    return create(WeakMapPrototype, {
+      // WeakMap#delete(key:void*):boolean
+      "delete": {value: bind.call(sharedDel, NULL, TRUE, keys, values)},
+      //:was WeakMap#get(key:void*[, d3fault:void*]):void*
+      // WeakMap#get(key:void*):void*
+      get:      {value: bind.call(sharedGet, NULL, TRUE, keys, values)},
+      // WeakMap#has(key:void*):boolean
+      has:      {value: bind.call(sharedHas, NULL, TRUE, keys, values)},
+      // WeakMap#set(key:void*, value:void*):void
+      set:      {value: bind.call(sharedSet, NULL, TRUE, keys, values)}
+    });
+
+  }
+
+  // Map(void):Map
+  function Map() {
+
+    // private references holders
+    var
+      keys = [],
+      values = []
+    ;
+
+    // returns freshly new created
+    // instanceof WeakMap in any case
+    return create(MapPrototype, {
+      // Map#delete(key:void*):boolean
+      "delete": {value: bind.call(sharedDel, NULL, FALSE, keys, values)},
+      //:was Map#get(key:void*[, d3fault:void*]):void*
+      // Map#get(key:void*):void*
+      get:      {value: bind.call(sharedGet, NULL, FALSE, keys, values)},
+      // Map#has(key:void*):boolean
+      has:      {value: bind.call(sharedHas, NULL, FALSE, keys, values)},
+      // Map#set(key:void*, value:void*):void
+      set:      {value: bind.call(sharedSet, NULL, FALSE, keys, values)}
+      /*,
+      // Map#size(void):number === Mozilla only so far
+      size:     {value: bind.call(sharedSize, NULL, keys)},
+      // Map#keys(void):Array === not in specs
+      keys:     {value: boundSlice(keys)},
+      // Map#values(void):Array === not in specs
+      values:   {value: boundSlice(values)},
+      // Map#iterate(callback:Function, context:void*):void ==> callback.call(context, key, value, index) === not in specs
+      iterate:  {value: bind.call(sharedIterate, NULL, FALSE, keys, values)}
+      //*/
+    });
+
+  }
+
+  // Set(void):Set
+  /**
+   * to be really honest, I would rather pollute Array.prototype
+   * in order to have Set like behavior
+   * Object.defineProperties(Array.prototype, {
+   *   add: {value: function add(value) {
+   *     return -1 < this.indexOf(value) && !!this.push(value);
+   *   }}
+   *   has: {value: function has(value) {
+   *     return -1 < this.indexOf(value);
+   *   }}
+   *   delete: {value: function delete(value) {
+   *     var i = this.indexOf(value);
+   *     return -1 < i && !!this.splice(i, 1);
+   *   }}
+   * });
+   * ... anyway ...
+   */
+  function Set() {
+    var
+      keys = [],  // placeholder used simply to recycle functions
+      values = [],// real storage
+      has = bind.call(sharedHas, NULL, FALSE, values, keys)
+    ;
+    return create(SetPrototype, {
+      // Set#delete(value:void*):boolean
+      "delete": {value: bind.call(sharedDel, NULL, FALSE, values, keys)},
+      // Set#has(value:void*):boolean
+      has:      {value: has},
+      // Set#add(value:void*):boolean
+      add:      {value: bind.call(Set_add, NULL, FALSE, has, values)}
+      /*,
+      // Map#size(void):number === Mozilla only
+      size:     {value: bind.call(sharedSize, NULL, values)},
+      // Set#values(void):Array === not in specs
+      values:   {value: boundSlice(values)},
+      // Set#iterate(callback:Function, context:void*):void ==> callback.call(context, value, index) === not in specs
+      iterate:  {value: bind.call(Set_iterate, NULL, FALSE, NULL, values)}
+      //*/
+    });
+  }
+
+  // common shared method recycled for all shims through bind
+  function sharedDel(objectOnly, keys, values, key) {
+    if (sharedHas(objectOnly, keys, values, key)) {
+      keys.splice(i, 1);
+      values.splice(i, 1);
+    }
+    // Aurora here does it while Canary doesn't
+    return -1 < i;
+  }
+
+  function sharedGet(objectOnly, keys, values, key/*, d3fault*/) {
+    return sharedHas(objectOnly, keys, values, key) ? values[i] : undefined; //d3fault;
+  }
+
+  function sharedHas(objectOnly, keys, values, key) {
+    if (objectOnly && key !== Object(key))
+      throw new TypeError("not a non-null object")
+    ;
+    i = betterIndexOf.call(keys, key);
+    return -1 < i;
+  }
+
+  function sharedSet(objectOnly, keys, values, key, value) {
+    /* return */sharedHas(objectOnly, keys, values, key) ?
+      values[i] = value
+      :
+      values[keys.push(key) - 1] = value
+    ;
+  }
+
+  /* keys, values, and iterate related methods
+  function boundSlice(values) {
+    return function () {
+      return slice.call(values);
+    };
+  }
+
+  function sharedSize(keys) {
+    return keys.length;
+  }
+
+  function sharedIterate(objectOnly, keys, values, callback, context) {
+    for (var
+      k = slice.call(keys), v = slice.call(values),
+      i = 0, length = k.length;
+      i < length; callback.call(context, k[i], v[i], i++)
+    );
+  }
+
+  function Set_iterate(objectOnly, keys, values, callback, context) {
+    for (var
+      v = slice.call(values),
+      i = 0, length = v.length;
+      i < length; callback.call(context, v[i], i++)
+    );
+  }
+  //*/
+
+  // Set#add recycled through bind per each instanceof Set
+  function Set_add(objectOnly, has, values, value) {
+    /*return */(!has(value) && !!values.push(value));
+  }
+
+  // a more reliable indexOf
+  function betterIndexOf(value) {
+    if (value != value || value === 0) {
+      for (i = this.length; i-- && !is(this[i], value););
+    } else {
+      i = indexOf.call(this, value);
+    }
+    return i;
+  }
+
+  // need for an empty constructor ...
+  function Constructor(){}  // GC'ed if !!Object.create
+  // ... so that new WeakMapInstance and new WeakMap
+  // produces both an instanceof WeakMap
+
+  var
+    // shortcuts and ...
+    NULL = null, TRUE = true, FALSE = false,
+    notInNode = module == "undefined",
+    window = notInNode ? this : global,
+    module = notInNode ? {} : exports,
+    Object = window.Object,
+    WeakMapPrototype = WeakMap.prototype,
+    MapPrototype = Map.prototype,
+    SetPrototype = Set.prototype,
+    defineProperty = Object.defineProperty,
+    slice = [].slice,
+
+    // Object.is(a, b) shim
+    is = Object.is || function (a, b) {
+      return a === b ?
+        a !== 0 || 1 / a == 1 / b :
+        a != a && b != b
+      ;
+    },
+
+    // partial polyfill for this aim only
+    bind = WeakMap.bind || function bind(context, objectOnly, keys, values) {
+      // partial fast ad-hoc Function#bind polyfill if not available
+      var callback = this;
+      return function bound(key, value) {
+        return callback.call(context, objectOnly, keys, values, key, value);
+      };
+    },
+
+    create = Object.create || function create(proto, descriptor) {
+      // partial ad-hoc Object.create shim if not available
+      Constructor.prototype = proto;
+      var object = new Constructor, key;
+      for (key in descriptor) {
+        object[key] = descriptor[key].value;
+      }
+      return object;
+    },
+
+    indexOf = [].indexOf || function indexOf(value) {
+      // partial fast Array#indexOf polyfill if not available
+      for (i = this.length; i-- && this[i] !== value;);
+      return i;
+    },
+
+    undefined,
+    i // recycle ALL the variables !
+  ;
+
+  // ~indexOf.call([NaN], NaN) as future possible feature detection
+
+  // used to follow FF behavior where WeakMap.prototype is a WeakMap itself
+  WeakMap.prototype = WeakMapPrototype = WeakMap();
+  Map.prototype = MapPrototype = Map();
+  Set.prototype = SetPrototype = Set();
+
+  // assign it to the global context
+  // if already there, e.g. in node, export native
+  window.WeakMap = module.WeakMap = window.WeakMap || WeakMap;
+  window.Map = module.Map = window.Map || Map;
+  window.Set = module.Set = window.Set || Set;
+
+  /* probably not needed, add a slash to ensure non configurable and non writable
+  if (defineProperty) {
+    defineProperty(window, "WeakMap", {value: WeakMap});
+    defineProperty(window, "Map", {value: Map});
+    defineProperty(window, "Set", {value: Set});
+  }
+  //*/
+
+  // that's pretty much it
+
+}.call(
+  this,
+  typeof exports
+));
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],2:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -1049,7 +1319,7 @@ request.put = function(url, data, fn){
 
 module.exports = request;
 
-},{"emitter":2,"reduce":3}],2:[function(require,module,exports){
+},{"emitter":3,"reduce":4}],3:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -1215,7 +1485,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 
 /**
  * Reduce `arr` with `fn`.
@@ -1240,7 +1510,7 @@ module.exports = function(arr, fn, initial){
   
   return curr;
 };
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 
 var rng;
@@ -1275,7 +1545,7 @@ module.exports = rng;
 
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (Buffer){
 //     uuid.js
 //
@@ -1466,22 +1736,7 @@ uuid.BufferClass = BufferClass;
 module.exports = uuid;
 
 }).call(this,require("buffer").Buffer)
-},{"./rng":4,"buffer":11}],6:[function(require,module,exports){
-function Node(init) {
-	this.text = init.text || "New Node";
-	this.position = init.position;
-}
-
-function Position(x, y) {
-	this.x = x;
-	this.y = y;
-}
-
-module.exports = {
-	Node: Node,
-	Position: Position
-};
-},{}],7:[function(require,module,exports){
+},{"./rng":5,"buffer":12}],7:[function(require,module,exports){
 module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = { x: 0, y: 0 }, 
@@ -1530,18 +1785,20 @@ module.exports = function(el) {
 		dragCoords = xy(e);
 	};
 };
-},{"./xy":10}],8:[function(require,module,exports){
+},{"./xy":11}],8:[function(require,module,exports){
 var svgMaker = require('./svg-maker'),
 	request = require('superagent'),
 	xy = require('./xy'),
-	core = require('./core'),
 	uuid = require('uuid'),
+	model = require('./model'),
 	db = {};
 
 var activeNodes = [];
 
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
+
+	model.init(db);
 
 	db.nodes.forEach(function(n) {
 		canvas.appendChild(svgMaker.createSvgNode(n));
@@ -1585,15 +1842,19 @@ canvas.addEventListener("dblclick", function(e) {
 });
 
 canvas.addEventListener("click", function(e) {
-	console.clear();
-	console.dir(e);
-
 	// Check if a node was clicked
 	if (e.target.parentNode.dataset.nodeId) {
 		if (e.shiftKey)
 			addActiveNode(e.target.parentNode);
-		else
+		else {
+			document.dispatchEvent(new CustomEvent("ui-set-active-node", {
+				detail: {
+					nodeId: e.target.parentNode.dataset.nodeId
+				}
+			}));
+
 			setActiveNode(e.target.parentNode);
+		}
 	}
 });
 
@@ -1635,7 +1896,50 @@ function addActiveNode(node) {
 	activeNodes.push(node);
 	node.classList.add("active");
 }
-},{"./core":6,"./svg-maker":9,"./xy":10,"superagent":1,"uuid":5}],9:[function(require,module,exports){
+},{"./model":9,"./svg-maker":10,"./xy":11,"superagent":2,"uuid":6}],9:[function(require,module,exports){
+require('es6-collections');
+
+module.exports = function() {
+	var nodes = new Map(),
+		activeNodes = [];
+
+	var findNode = function(id) {
+		var index = nodes.forEach(function(node) {
+			if (node.id == id)
+				return node;
+		});
+	};
+
+	var setActiveNode = function(e) {
+		activeNodes.length = 0;
+		activeNodes.push(nodes.get(e.detail.nodeId));
+
+		console.dir(activeNodes);
+	};
+
+	var _ = {
+		on: function(name, cb) {
+			document.addEventListener(name, cb)
+		},
+		publish: function(name, details) {
+			document.dispatchEvent(new CustomEvent(name, {
+				bubbles: true,
+				detail: details
+			}));
+		}
+	}
+
+	return {
+		init: function(db) {
+			db.nodes.forEach(function(node) {
+				nodes.set(node.id, node);
+			});
+
+			_.on("ui-set-active-node", setActiveNode);
+		}
+	};
+}();
+},{"es6-collections":1}],10:[function(require,module,exports){
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 
@@ -1673,7 +1977,7 @@ function createSvgRepresentationOfNode(node) {
 module.exports = {
 	createSvgNode: createSvgRepresentationOfNode
 };
-},{"./drag":7}],10:[function(require,module,exports){
+},{"./drag":7}],11:[function(require,module,exports){
 /** 
 * Returns the x and y values from a MouseEvent or a svg group element (that gets 
 * its position via a css translate function).
@@ -1708,7 +2012,7 @@ function getTranslateValues(el) {
 		y: parseInt(values[1])
 	};
 }
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -2866,7 +3170,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":12,"ieee754":13}],12:[function(require,module,exports){
+},{"base64-js":13,"ieee754":14}],13:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -2988,7 +3292,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
