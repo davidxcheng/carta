@@ -3,14 +3,17 @@ var svgMaker = require('./svg-maker'),
 	xy = require('./xy'),
 	uuid = require('uuid'),
 	model = require('./model'),
+	domWhisperer = require('./dom-whisperer'),
 	db = {};
 
 var activeNodes = [];
 
+domWhisperer(canvas);
+
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
 
-	model.init(db);
+	model.init(db, canvas);
 
 	db.nodes.forEach(function(n) {
 		canvas.appendChild(svgMaker.createSvgNode(n));

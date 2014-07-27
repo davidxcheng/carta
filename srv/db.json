@@ -1,1 +1,1 @@
-{"nodes":[{"id":"start","text":"Event","position":{"x":289,"y":246}},{"id":"member-notifications","text":"Member Notifications","position":{"x":581,"y":121}}],"relations":[{"node1":"start","node2":"member-notifications","text":""}]}
+{"nodes":[{"id":"start","text":"Event","position":{"x":387,"y":120}},{"id":"member-notifications","text":"Member Notifications","position":{"x":581,"y":121}}],"relations":[{"node1":"start","node2":"member-notifications","text":""}]}
