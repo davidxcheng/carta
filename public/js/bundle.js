@@ -1771,6 +1771,7 @@ module.exports = function(el) {
 	view = el;
 
 	$(view).on("x-node-created", reportNewNode);
+	$(view).on("x-node-deleted", reportDeletedNode);
 };
 },{"./util.js":14,"superagent":2}],8:[function(require,module,exports){
 require('es6-collections');

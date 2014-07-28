@@ -32,4 +32,5 @@ module.exports = function(el) {
 	view = el;
 
 	$(view).on("x-node-created", reportNewNode);
+	$(view).on("x-node-deleted", reportDeletedNode);
 };
