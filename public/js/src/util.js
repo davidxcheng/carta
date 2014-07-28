@@ -12,6 +12,6 @@ module.exports = function(el) {
 
 	return { 
 		on: sub.bind(el),
-		publish: pub.bind(el)
+		emit: pub.bind(el)
 	};
 };

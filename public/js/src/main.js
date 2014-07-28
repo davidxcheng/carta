@@ -4,20 +4,17 @@ var svgMaker = require('./svg-maker'),
 	uuid = require('uuid'),
 	model = require('./model'),
 	domWhisperer = require('./dom-whisperer'),
+	ambassador = require('./ambassador'),
 	db = {};
 
 var activeNodes = [];
 
 domWhisperer(canvas);
+ambassador(canvas);
 
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
-
 	model.init(db, canvas);
-
-	db.nodes.forEach(function(n) {
-		canvas.appendChild(svgMaker.createSvgNode(n));
-	});
 });
 
 canvas.addEventListener("ui-drag-end", function(e) {
@@ -38,21 +35,13 @@ canvas.addEventListener("ui-drag-end", function(e) {
 canvas.addEventListener("dblclick", function(e) {
 	// Create a new node if user double clicks canvas
 	if (this == e.target) {
-		var origo = xy(e);
-
 		var node = {
 			id: uuid.v4(),
 			text: "",
-			position: origo
+			position: xy(e)
 		}
 
 		db.nodes.push(node);
-		request
-			.post("nodes/")
-			.send(node)
-			.end(function(err, res){});
-		canvas.appendChild(svgMaker.createSvgNode(node));
-		setActiveNode(canvas.lastChild);
 	}
 });
 

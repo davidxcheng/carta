@@ -1736,19 +1736,83 @@ uuid.BufferClass = BufferClass;
 module.exports = uuid;
 
 }).call(this,require("buffer").Buffer)
-},{"./rng":5,"buffer":14}],7:[function(require,module,exports){
+},{"./rng":5,"buffer":15}],7:[function(require,module,exports){
+/**
+* The Ambassador listens to what happens in Clientland and
+* reports back to Serverland.
+*
+* The Ambassador also brings new from Serverland to Clientland.
+**/
+var $ = require('./util.js'),
+	request = require('superagent'),
+	view = null;
+
+var reportNewNode = function(e) {
+	request
+		.post("nodes/")
+		.send(e.detail.node)
+		.end(function(err, res){
+
+		});
+};
+
+module.exports = function(el) {
+	view = el;
+
+	$(view).on("x-node-created", reportNewNode);
+};
+},{"./util.js":13,"superagent":2}],8:[function(require,module,exports){
 var svgMaker = require("./svg-maker"),
-	$ = require('./util.js');
+	$ = require('./util'),
+	xy = require('./xy'),
+	uuid = require('uuid'),
+	view = null,
+	activeNodes = [];
 
 function addNode(e) {
-	console.log("node added!");
-	console.dir(e);
+	view.appendChild(svgMaker.createSvgNode(e.detail.node));
+
+	if (e.type == "x-node-created") {
+		setActiveNode(view.lastChild);
+	}
+}
+
+function createNode(e) {
+	// if user double clicks canvas
+	if (this == e.target) {
+		var origo = xy(e);
+
+		var node = {
+			id: uuid.v4(),
+			text: "",
+			position: origo
+		}
+
+		$(view).emit("ui-create-node", {
+			node: node
+		});
+	}
+}
+
+function setActiveNode(node) {
+	// TODO: clear event listeners from current active node.
+	activeNodes.forEach(function(n) {
+		n.classList.remove("active");		
+	});
+
+	activeNodes.length = 0;
+
+	activeNodes.push(node);
+	node.classList.add("active");
 }
 
 module.exports = function(el) {
+	view = el;
 	$(el).on("x-node-added", addNode);
+	$(el).on("x-node-created", addNode);
+	$(el).on("dblclick", createNode);
 };
-},{"./svg-maker":11,"./util.js":12}],8:[function(require,module,exports){
+},{"./svg-maker":12,"./util":13,"./xy":14,"uuid":6}],9:[function(require,module,exports){
 module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = { x: 0, y: 0 }, 
@@ -1797,27 +1861,24 @@ module.exports = function(el) {
 		dragCoords = xy(e);
 	};
 };
-},{"./xy":13}],9:[function(require,module,exports){
+},{"./xy":14}],10:[function(require,module,exports){
 var svgMaker = require('./svg-maker'),
 	request = require('superagent'),
 	xy = require('./xy'),
 	uuid = require('uuid'),
 	model = require('./model'),
 	domWhisperer = require('./dom-whisperer'),
+	ambassador = require('./ambassador'),
 	db = {};
 
 var activeNodes = [];
 
 domWhisperer(canvas);
+ambassador(canvas);
 
 request.get('fake/db', function(res) {
 	db = JSON.parse(res.text);
-
 	model.init(db, canvas);
-
-	db.nodes.forEach(function(n) {
-		canvas.appendChild(svgMaker.createSvgNode(n));
-	});
 });
 
 canvas.addEventListener("ui-drag-end", function(e) {
@@ -1838,21 +1899,13 @@ canvas.addEventListener("ui-drag-end", function(e) {
 canvas.addEventListener("dblclick", function(e) {
 	// Create a new node if user double clicks canvas
 	if (this == e.target) {
-		var origo = xy(e);
-
 		var node = {
 			id: uuid.v4(),
 			text: "",
-			position: origo
+			position: xy(e)
 		}
 
 		db.nodes.push(node);
-		request
-			.post("nodes/")
-			.send(node)
-			.end(function(err, res){});
-		canvas.appendChild(svgMaker.createSvgNode(node));
-		setActiveNode(canvas.lastChild);
 	}
 });
 
@@ -1911,13 +1964,23 @@ function addActiveNode(node) {
 	activeNodes.push(node);
 	node.classList.add("active");
 }
-},{"./dom-whisperer":7,"./model":10,"./svg-maker":11,"./xy":13,"superagent":2,"uuid":6}],10:[function(require,module,exports){
+},{"./ambassador":7,"./dom-whisperer":8,"./model":11,"./svg-maker":12,"./xy":14,"superagent":2,"uuid":6}],11:[function(require,module,exports){
 require('es6-collections');
 var $ = require('./util.js');
 
 module.exports = function() {
 	var nodes = new Map(),
+		view = null,
 		activeNodes = [];
+
+	var createNode = function(e) {
+		console.dir(e);
+		var node = e.detail.node;
+		nodes.set(node.id, node);
+		$(view).emit("x-node-created", {
+			node: node	
+		});
+	};
 
 	var setActiveNode = function(e) {
 		activeNodes.length = 0;
@@ -1926,18 +1989,21 @@ module.exports = function() {
 
 	return {
 		init: function(db, el) {
+			view = el;
+
 			db.nodes.forEach(function(node) {
 				nodes.set(node.id, node);
-				$(el).publish("x-node-added", {
+				$(el).emit("x-node-added", {
 					node: node
 				});
 			});
 
-			$(el).on("ui-set-active-node", setActiveNode);
+			$(view).on("ui-set-active-node", setActiveNode);
+			$(view).on("ui-create-node", createNode);
 		}
 	};
 }();
-},{"./util.js":12,"es6-collections":1}],11:[function(require,module,exports){
+},{"./util.js":13,"es6-collections":1}],12:[function(require,module,exports){
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 
@@ -1975,7 +2041,7 @@ function createSvgRepresentationOfNode(node) {
 module.exports = {
 	createSvgNode: createSvgRepresentationOfNode
 };
-},{"./drag":8}],12:[function(require,module,exports){
+},{"./drag":9}],13:[function(require,module,exports){
 module.exports = function(el) {
 	function sub(name, cb) {
 		this.addEventListener(name, cb);
@@ -1990,10 +2056,10 @@ module.exports = function(el) {
 
 	return { 
 		on: sub.bind(el),
-		publish: pub.bind(el)
+		emit: pub.bind(el)
 	};
 };
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /** 
 * Returns the x and y values from a MouseEvent or a svg group element (that gets 
 * its position via a css translate function).
@@ -2028,7 +2094,7 @@ function getTranslateValues(el) {
 		y: parseInt(values[1])
 	};
 }
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -3186,7 +3252,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":15,"ieee754":16}],15:[function(require,module,exports){
+},{"base64-js":16,"ieee754":17}],16:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -3308,7 +3374,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -3394,4 +3460,4 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}]},{},[9])
+},{}]},{},[10])

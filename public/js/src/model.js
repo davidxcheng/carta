@@ -3,7 +3,17 @@ var $ = require('./util.js');
 
 module.exports = function() {
 	var nodes = new Map(),
+		view = null,
 		activeNodes = [];
+
+	var createNode = function(e) {
+		console.dir(e);
+		var node = e.detail.node;
+		nodes.set(node.id, node);
+		$(view).emit("x-node-created", {
+			node: node	
+		});
+	};
 
 	var setActiveNode = function(e) {
 		activeNodes.length = 0;
@@ -12,14 +22,17 @@ module.exports = function() {
 
 	return {
 		init: function(db, el) {
+			view = el;
+
 			db.nodes.forEach(function(node) {
 				nodes.set(node.id, node);
-				$(el).publish("x-node-added", {
+				$(el).emit("x-node-added", {
 					node: node
 				});
 			});
 
-			$(el).on("ui-set-active-node", setActiveNode);
+			$(view).on("ui-set-active-node", setActiveNode);
+			$(view).on("ui-create-node", createNode);
 		}
 	};
 }();
