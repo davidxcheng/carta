@@ -1736,7 +1736,7 @@ uuid.BufferClass = BufferClass;
 module.exports = uuid;
 
 }).call(this,require("buffer").Buffer)
-},{"./rng":5,"buffer":15}],7:[function(require,module,exports){
+},{"./rng":5,"buffer":16}],7:[function(require,module,exports){
 /**
 * The Ambassador listens to what happens in Clientland and
 * reports back to Serverland.
@@ -1756,28 +1756,44 @@ var reportNewNode = function(e) {
 		});
 };
 
+var reportDeletedNode = function(e) {
+	var nodeId = e.detail.nodeId;
+
+	request
+		.del("nodes/" + nodeId)
+		.end(function(err, res) {
+			if (err) 
+				throw "Error when deleting node with id " + nodeId;
+		});
+};
+
 module.exports = function(el) {
 	view = el;
 
 	$(view).on("x-node-created", reportNewNode);
 };
-},{"./util.js":13,"superagent":2}],8:[function(require,module,exports){
+},{"./util.js":14,"superagent":2}],8:[function(require,module,exports){
+require('es6-collections');
+
 var svgMaker = require("./svg-maker"),
 	$ = require('./util'),
 	xy = require('./xy'),
 	uuid = require('uuid'),
 	view = null,
+	nodes = new Map();
 	activeNodes = [];
 
-function addNode(e) {
+var addNode = function(e) {
 	view.appendChild(svgMaker.createSvgNode(e.detail.node));
+	nodes.set(e.detail.node.id, view.lastChild);
 
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
 	}
 }
 
-function createNode(e) {
+var createNode = function(e) {
+	// TODO: Move to mouse-trapper
 	// if user double clicks canvas
 	if (this == e.target) {
 		var origo = xy(e);
@@ -1794,24 +1810,41 @@ function createNode(e) {
 	}
 }
 
-function setActiveNode(node) {
+var deletePressed = function() {
+	activeNodes.forEach(function(node) {
+		$(view).emit("ui-delete-node", {
+			nodeId: node.dataset.nodeId
+		});
+	});
+	activeNodes.length = 0;
+}
+
+var deleteNode = function(e) {
+	// TODO: clear all refs to node.
+	var node = nodes.get(e.detail.nodeId);
+	node.parentNode.removeChild(node);
+	nodes.delete(node.id);
+}
+
+var setActiveNode = function(node) {
 	// TODO: clear event listeners from current active node.
 	activeNodes.forEach(function(n) {
 		n.classList.remove("active");		
 	});
 
 	activeNodes.length = 0;
-	
+
 	activeNodes.push(node);
 	node.classList.add("active");
 }
 
-function addActiveNode(node) {
+var addActiveNode = function(node) {
 	activeNodes.push(node);
 	node.classList.add("active");
 }
 
-function clicky(e) {
+var clicky = function(e) {
+	// TODO: Move to mouse-trapper
 	// Check if a node was clicked
 	if (e.target.parentNode.dataset.nodeId) {
 		if (e.shiftKey)
@@ -1825,10 +1858,12 @@ module.exports = function(el) {
 	view = el;
 	$(el).on("x-node-added", addNode);
 	$(el).on("x-node-created", addNode);
+	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("dblclick", createNode);
+	$(el).on("key-down-delete", deletePressed)
 	$(el).on("click", clicky);
 };
-},{"./svg-maker":12,"./util":13,"./xy":14,"uuid":6}],9:[function(require,module,exports){
+},{"./svg-maker":13,"./util":14,"./xy":15,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
 module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = { x: 0, y: 0 }, 
@@ -1877,23 +1912,31 @@ module.exports = function(el) {
 		dragCoords = xy(e);
 	};
 };
-},{"./xy":14}],10:[function(require,module,exports){
-var svgMaker = require('./svg-maker'),
-	request = require('superagent'),
-	xy = require('./xy'),
-	uuid = require('uuid'),
+},{"./xy":15}],10:[function(require,module,exports){
+var $ = require('./util');
+
+module.exports = (function(b){
+	$(b).on("keydown", function(e) {
+		switch(e.keyCode) {
+			case 46: // delete
+				$(canvas).emit("key-down-delete");
+				break;
+		}
+	});
+})(body);
+},{"./util":14}],11:[function(require,module,exports){
+require('./key-trapper');
+
+var request = require('superagent'),
 	model = require('./model'),
 	domWhisperer = require('./dom-whisperer'),
-	ambassador = require('./ambassador'),
-	db = {};
-
-var activeNodes = [];
-
+	ambassador = require('./ambassador');
+	
 domWhisperer(canvas);
 ambassador(canvas);
 
 request.get('fake/db', function(res) {
-	db = JSON.parse(res.text);
+	var db = JSON.parse(res.text);
 	model.init(db, canvas);
 });
 
@@ -1911,44 +1954,7 @@ canvas.addEventListener("ui-drag-end", function(e) {
 			//console.dir(res);
 		});
 });
-
-canvas.addEventListener("dblclick", function(e) {
-	// Create a new node if user double clicks canvas
-	if (this == e.target) {
-		var node = {
-			id: uuid.v4(),
-			text: "",
-			position: xy(e)
-		}
-
-		db.nodes.push(node);
-	}
-});
-
-body.addEventListener("keydown", function(e) {
-	switch (e.keyCode) {
-		case 46: //delete
-			console.dir(e);
-			activeNodes.forEach(function(node) {
-				request
-					.del("nodes/" + node.dataset.nodeId)
-					.end(function(err, res) {
-						if (err) 
-							throw "Error when deleting node with id " + node.dataset.nodeId;
-
-						// TODO: clear all refs to active node.
-						var index = db.nodes.indexOf(node.dataset.nodeId);
-
-						db.nodes.splice(index, 1);
-						node.parentNode.removeChild(node);
-					});
-			});
-			activeNodes.length = 0;
-			break;
-	}
-});
-
-},{"./ambassador":7,"./dom-whisperer":8,"./model":11,"./svg-maker":12,"./xy":14,"superagent":2,"uuid":6}],11:[function(require,module,exports){
+},{"./ambassador":7,"./dom-whisperer":8,"./key-trapper":10,"./model":12,"superagent":2}],12:[function(require,module,exports){
 require('es6-collections');
 var $ = require('./util.js');
 
@@ -1957,7 +1963,6 @@ module.exports = function() {
 		view = null;
 
 	var createNode = function(e) {
-		console.dir(e);
 		var node = e.detail.node;
 		nodes.set(node.id, node);
 		$(view).emit("x-node-created", {
@@ -1966,7 +1971,10 @@ module.exports = function() {
 	};
 
 	var removeNode = function(e) {
-		console.dir(e);
+		nodes.delete(e.detail.nodeId);
+		$(view).emit("x-node-deleted", {
+			nodeId: e.detail.nodeId
+		});
 	};
 
 	return {
@@ -1985,7 +1993,7 @@ module.exports = function() {
 		}
 	};
 }();
-},{"./util.js":13,"es6-collections":1}],12:[function(require,module,exports){
+},{"./util.js":14,"es6-collections":1}],13:[function(require,module,exports){
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 
@@ -2023,7 +2031,7 @@ function createSvgRepresentationOfNode(node) {
 module.exports = {
 	createSvgNode: createSvgRepresentationOfNode
 };
-},{"./drag":9}],13:[function(require,module,exports){
+},{"./drag":9}],14:[function(require,module,exports){
 module.exports = function(el) {
 	function sub(name, cb) {
 		this.addEventListener(name, cb);
@@ -2041,7 +2049,7 @@ module.exports = function(el) {
 		emit: pub.bind(el)
 	};
 };
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /** 
 * Returns the x and y values from a MouseEvent or a svg group element (that gets 
 * its position via a css translate function).
@@ -2076,7 +2084,7 @@ function getTranslateValues(el) {
 		y: parseInt(values[1])
 	};
 }
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -3234,7 +3242,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":16,"ieee754":17}],16:[function(require,module,exports){
+},{"base64-js":17,"ieee754":18}],17:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -3356,7 +3364,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -3442,4 +3450,4 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}]},{},[10])
+},{}]},{},[11])

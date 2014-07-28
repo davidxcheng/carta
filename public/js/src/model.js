@@ -6,7 +6,6 @@ module.exports = function() {
 		view = null;
 
 	var createNode = function(e) {
-		console.dir(e);
 		var node = e.detail.node;
 		nodes.set(node.id, node);
 		$(view).emit("x-node-created", {
@@ -15,7 +14,10 @@ module.exports = function() {
 	};
 
 	var removeNode = function(e) {
-		console.dir(e);
+		nodes.delete(e.detail.nodeId);
+		$(view).emit("x-node-deleted", {
+			nodeId: e.detail.nodeId
+		});
 	};
 
 	return {

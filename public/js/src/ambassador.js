@@ -17,6 +17,17 @@ var reportNewNode = function(e) {
 		});
 };
 
+var reportDeletedNode = function(e) {
+	var nodeId = e.detail.nodeId;
+
+	request
+		.del("nodes/" + nodeId)
+		.end(function(err, res) {
+			if (err) 
+				throw "Error when deleting node with id " + nodeId;
+		});
+};
+
 module.exports = function(el) {
 	view = el;
 
