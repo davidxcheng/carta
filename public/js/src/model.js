@@ -3,8 +3,7 @@ var $ = require('./util.js');
 
 module.exports = function() {
 	var nodes = new Map(),
-		view = null,
-		activeNodes = [];
+		view = null;
 
 	var createNode = function(e) {
 		console.dir(e);
@@ -15,9 +14,8 @@ module.exports = function() {
 		});
 	};
 
-	var setActiveNode = function(e) {
-		activeNodes.length = 0;
-		activeNodes.push(nodes.get(e.detail.nodeId));
+	var removeNode = function(e) {
+		console.dir(e);
 	};
 
 	return {
@@ -31,8 +29,8 @@ module.exports = function() {
 				});
 			});
 
-			$(view).on("ui-set-active-node", setActiveNode);
 			$(view).on("ui-create-node", createNode);
+			$(view).on("ui-delete-node", removeNode);
 		}
 	};
 }();

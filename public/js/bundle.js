@@ -1741,7 +1741,7 @@ module.exports = uuid;
 * The Ambassador listens to what happens in Clientland and
 * reports back to Serverland.
 *
-* The Ambassador also brings new from Serverland to Clientland.
+* The Ambassador also brings news from Serverland to Clientland.
 **/
 var $ = require('./util.js'),
 	request = require('superagent'),
@@ -1801,9 +1801,24 @@ function setActiveNode(node) {
 	});
 
 	activeNodes.length = 0;
-
+	
 	activeNodes.push(node);
 	node.classList.add("active");
+}
+
+function addActiveNode(node) {
+	activeNodes.push(node);
+	node.classList.add("active");
+}
+
+function clicky(e) {
+	// Check if a node was clicked
+	if (e.target.parentNode.dataset.nodeId) {
+		if (e.shiftKey)
+			addActiveNode(e.target.parentNode);
+		else
+			setActiveNode(e.target.parentNode);
+	}
 }
 
 module.exports = function(el) {
@@ -1811,6 +1826,7 @@ module.exports = function(el) {
 	$(el).on("x-node-added", addNode);
 	$(el).on("x-node-created", addNode);
 	$(el).on("dblclick", createNode);
+	$(el).on("click", clicky);
 };
 },{"./svg-maker":12,"./util":13,"./xy":14,"uuid":6}],9:[function(require,module,exports){
 module.exports = function(el) {
@@ -1909,26 +1925,10 @@ canvas.addEventListener("dblclick", function(e) {
 	}
 });
 
-canvas.addEventListener("click", function(e) {
-	// Check if a node was clicked
-	if (e.target.parentNode.dataset.nodeId) {
-		if (e.shiftKey)
-			addActiveNode(e.target.parentNode);
-		else {
-			document.dispatchEvent(new CustomEvent("ui-set-active-node", {
-				detail: {
-					nodeId: e.target.parentNode.dataset.nodeId
-				}
-			}));
-
-			setActiveNode(e.target.parentNode);
-		}
-	}
-});
-
 body.addEventListener("keydown", function(e) {
 	switch (e.keyCode) {
 		case 46: //delete
+			console.dir(e);
 			activeNodes.forEach(function(node) {
 				request
 					.del("nodes/" + node.dataset.nodeId)
@@ -1948,30 +1948,13 @@ body.addEventListener("keydown", function(e) {
 	}
 });
 
-function setActiveNode(node) {
-	// TODO: clear event listeners from current active node.
-	activeNodes.forEach(function(n) {
-		n.classList.remove("active");		
-	});
-
-	activeNodes.length = 0;
-
-	activeNodes.push(node);
-	node.classList.add("active");
-}
-
-function addActiveNode(node) {
-	activeNodes.push(node);
-	node.classList.add("active");
-}
 },{"./ambassador":7,"./dom-whisperer":8,"./model":11,"./svg-maker":12,"./xy":14,"superagent":2,"uuid":6}],11:[function(require,module,exports){
 require('es6-collections');
 var $ = require('./util.js');
 
 module.exports = function() {
 	var nodes = new Map(),
-		view = null,
-		activeNodes = [];
+		view = null;
 
 	var createNode = function(e) {
 		console.dir(e);
@@ -1982,9 +1965,8 @@ module.exports = function() {
 		});
 	};
 
-	var setActiveNode = function(e) {
-		activeNodes.length = 0;
-		activeNodes.push(nodes.get(e.detail.nodeId));
+	var removeNode = function(e) {
+		console.dir(e);
 	};
 
 	return {
@@ -1998,8 +1980,8 @@ module.exports = function() {
 				});
 			});
 
-			$(view).on("ui-set-active-node", setActiveNode);
 			$(view).on("ui-create-node", createNode);
+			$(view).on("ui-delete-node", removeNode);
 		}
 	};
 }();

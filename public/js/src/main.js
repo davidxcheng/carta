@@ -45,26 +45,10 @@ canvas.addEventListener("dblclick", function(e) {
 	}
 });
 
-canvas.addEventListener("click", function(e) {
-	// Check if a node was clicked
-	if (e.target.parentNode.dataset.nodeId) {
-		if (e.shiftKey)
-			addActiveNode(e.target.parentNode);
-		else {
-			document.dispatchEvent(new CustomEvent("ui-set-active-node", {
-				detail: {
-					nodeId: e.target.parentNode.dataset.nodeId
-				}
-			}));
-
-			setActiveNode(e.target.parentNode);
-		}
-	}
-});
-
 body.addEventListener("keydown", function(e) {
 	switch (e.keyCode) {
 		case 46: //delete
+			console.dir(e);
 			activeNodes.forEach(function(node) {
 				request
 					.del("nodes/" + node.dataset.nodeId)
@@ -83,20 +67,3 @@ body.addEventListener("keydown", function(e) {
 			break;
 	}
 });
-
-function setActiveNode(node) {
-	// TODO: clear event listeners from current active node.
-	activeNodes.forEach(function(n) {
-		n.classList.remove("active");		
-	});
-
-	activeNodes.length = 0;
-
-	activeNodes.push(node);
-	node.classList.add("active");
-}
-
-function addActiveNode(node) {
-	activeNodes.push(node);
-	node.classList.add("active");
-}

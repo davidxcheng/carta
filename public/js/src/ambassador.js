@@ -2,7 +2,7 @@
 * The Ambassador listens to what happens in Clientland and
 * reports back to Serverland.
 *
-* The Ambassador also brings new from Serverland to Clientland.
+* The Ambassador also brings news from Serverland to Clientland.
 **/
 var $ = require('./util.js'),
 	request = require('superagent'),

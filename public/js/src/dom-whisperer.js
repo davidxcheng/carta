@@ -37,9 +37,24 @@ function setActiveNode(node) {
 	});
 
 	activeNodes.length = 0;
-
+	
 	activeNodes.push(node);
 	node.classList.add("active");
+}
+
+function addActiveNode(node) {
+	activeNodes.push(node);
+	node.classList.add("active");
+}
+
+function clicky(e) {
+	// Check if a node was clicked
+	if (e.target.parentNode.dataset.nodeId) {
+		if (e.shiftKey)
+			addActiveNode(e.target.parentNode);
+		else
+			setActiveNode(e.target.parentNode);
+	}
 }
 
 module.exports = function(el) {
@@ -47,4 +62,5 @@ module.exports = function(el) {
 	$(el).on("x-node-added", addNode);
 	$(el).on("x-node-created", addNode);
 	$(el).on("dblclick", createNode);
+	$(el).on("click", clicky);
 };
