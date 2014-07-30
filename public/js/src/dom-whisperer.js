@@ -15,7 +15,7 @@ var addNode = function(e) {
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
 	}
-}
+};
 
 var createNode = function(e) {
 	// TODO: Move to mouse-trapper
@@ -33,7 +33,7 @@ var createNode = function(e) {
 			node: node
 		});
 	}
-}
+};
 
 var deletePressed = function() {
 	activeNodes.forEach(function(node) {
@@ -42,16 +42,17 @@ var deletePressed = function() {
 		});
 	});
 	activeNodes.length = 0;
-}
+};
 
 var deleteNode = function(e) {
 	// TODO: clear all refs to node.
 	var node = nodes.get(e.detail.nodeId);
 	node.parentNode.removeChild(node);
 	nodes.delete(node.id);
-}
+};
 
-var setActiveNode = function(node) {
+var setActiveNode = function(e) {
+	var node = e.detail.node;
 	// TODO: clear event listeners from current active node.
 	activeNodes.forEach(function(n) {
 		n.classList.remove("active");		
@@ -61,23 +62,13 @@ var setActiveNode = function(node) {
 
 	activeNodes.push(node);
 	node.classList.add("active");
-}
+};
 
-var addActiveNode = function(node) {
+var addActiveNode = function(e) {
+	var node = e.detail.node;
 	activeNodes.push(node);
 	node.classList.add("active");
-}
-
-var clicky = function(e) {
-	// TODO: Move to mouse-trapper
-	// Check if a node was clicked
-	if (e.target.parentNode.dataset.nodeId) {
-		if (e.shiftKey)
-			addActiveNode(e.target.parentNode);
-		else
-			setActiveNode(e.target.parentNode);
-	}
-}
+};
 
 module.exports = function(el) {
 	view = el;
@@ -86,5 +77,6 @@ module.exports = function(el) {
 	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("dblclick", createNode);
 	$(el).on("key-down-delete", deletePressed)
-	$(el).on("click", clicky);
+	$(el).on("mouse-select-node", setActiveNode);
+	$(el).on("mouse-select-nodes", addActiveNode);
 };

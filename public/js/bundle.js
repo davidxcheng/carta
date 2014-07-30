@@ -1736,7 +1736,7 @@ uuid.BufferClass = BufferClass;
 module.exports = uuid;
 
 }).call(this,require("buffer").Buffer)
-},{"./rng":5,"buffer":16}],7:[function(require,module,exports){
+},{"./rng":5,"buffer":17}],7:[function(require,module,exports){
 /**
 * The Ambassador listens to what happens in Clientland and
 * reports back to Serverland.
@@ -1773,7 +1773,7 @@ module.exports = function(el) {
 	$(view).on("x-node-created", reportNewNode);
 	$(view).on("x-node-deleted", reportDeletedNode);
 };
-},{"./util.js":14,"superagent":2}],8:[function(require,module,exports){
+},{"./util.js":15,"superagent":2}],8:[function(require,module,exports){
 require('es6-collections');
 
 var svgMaker = require("./svg-maker"),
@@ -1791,7 +1791,7 @@ var addNode = function(e) {
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
 	}
-}
+};
 
 var createNode = function(e) {
 	// TODO: Move to mouse-trapper
@@ -1809,7 +1809,7 @@ var createNode = function(e) {
 			node: node
 		});
 	}
-}
+};
 
 var deletePressed = function() {
 	activeNodes.forEach(function(node) {
@@ -1818,16 +1818,17 @@ var deletePressed = function() {
 		});
 	});
 	activeNodes.length = 0;
-}
+};
 
 var deleteNode = function(e) {
 	// TODO: clear all refs to node.
 	var node = nodes.get(e.detail.nodeId);
 	node.parentNode.removeChild(node);
 	nodes.delete(node.id);
-}
+};
 
-var setActiveNode = function(node) {
+var setActiveNode = function(e) {
+	var node = e.detail.node;
 	// TODO: clear event listeners from current active node.
 	activeNodes.forEach(function(n) {
 		n.classList.remove("active");		
@@ -1837,23 +1838,13 @@ var setActiveNode = function(node) {
 
 	activeNodes.push(node);
 	node.classList.add("active");
-}
+};
 
-var addActiveNode = function(node) {
+var addActiveNode = function(e) {
+	var node = e.detail.node;
 	activeNodes.push(node);
 	node.classList.add("active");
-}
-
-var clicky = function(e) {
-	// TODO: Move to mouse-trapper
-	// Check if a node was clicked
-	if (e.target.parentNode.dataset.nodeId) {
-		if (e.shiftKey)
-			addActiveNode(e.target.parentNode);
-		else
-			setActiveNode(e.target.parentNode);
-	}
-}
+};
 
 module.exports = function(el) {
 	view = el;
@@ -1862,9 +1853,10 @@ module.exports = function(el) {
 	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("dblclick", createNode);
 	$(el).on("key-down-delete", deletePressed)
-	$(el).on("click", clicky);
+	$(el).on("mouse-select-node", setActiveNode);
+	$(el).on("mouse-select-nodes", addActiveNode);
 };
-},{"./svg-maker":13,"./util":14,"./xy":15,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
+},{"./svg-maker":14,"./util":15,"./xy":16,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
 module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = { x: 0, y: 0 }, 
@@ -1913,7 +1905,7 @@ module.exports = function(el) {
 		dragCoords = xy(e);
 	};
 };
-},{"./xy":15}],10:[function(require,module,exports){
+},{"./xy":16}],10:[function(require,module,exports){
 var $ = require('./util');
 
 module.exports = (function(b){
@@ -1925,15 +1917,17 @@ module.exports = (function(b){
 		}
 	});
 })(body);
-},{"./util":14}],11:[function(require,module,exports){
+},{"./util":15}],11:[function(require,module,exports){
 require('./key-trapper');
 
 var request = require('superagent'),
 	model = require('./model'),
 	domWhisperer = require('./dom-whisperer'),
+	mouseTrapper = require('./mouse-trapper'),
 	ambassador = require('./ambassador');
 	
 domWhisperer(canvas);
+mouseTrapper(canvas);
 ambassador(canvas);
 
 request.get('fake/db', function(res) {
@@ -1955,7 +1949,7 @@ canvas.addEventListener("ui-drag-end", function(e) {
 			//console.dir(res);
 		});
 });
-},{"./ambassador":7,"./dom-whisperer":8,"./key-trapper":10,"./model":12,"superagent":2}],12:[function(require,module,exports){
+},{"./ambassador":7,"./dom-whisperer":8,"./key-trapper":10,"./model":12,"./mouse-trapper":13,"superagent":2}],12:[function(require,module,exports){
 require('es6-collections');
 var $ = require('./util.js');
 
@@ -1994,7 +1988,25 @@ module.exports = function() {
 		}
 	};
 }();
-},{"./util.js":14,"es6-collections":1}],13:[function(require,module,exports){
+},{"./util.js":15,"es6-collections":1}],13:[function(require,module,exports){
+var $ = require('./util');
+
+module.exports = function(el) {
+	$(el).on("click", function(e) {
+		// Check if a node was clicked
+		if (e.target.parentNode.dataset.nodeId) {
+			if (e.shiftKey)
+				$(el).emit("mouse-select-nodes", {
+					node: e.target.parentNode
+				});
+			else
+				$(el).emit("mouse-select-node", {
+					node: e.target.parentNode 
+				});
+		}
+	});
+};
+},{"./util":15}],14:[function(require,module,exports){
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 
@@ -2032,7 +2044,7 @@ function createSvgRepresentationOfNode(node) {
 module.exports = {
 	createSvgNode: createSvgRepresentationOfNode
 };
-},{"./drag":9}],14:[function(require,module,exports){
+},{"./drag":9}],15:[function(require,module,exports){
 module.exports = function(el) {
 	function sub(name, cb) {
 		this.addEventListener(name, cb);
@@ -2050,7 +2062,7 @@ module.exports = function(el) {
 		emit: pub.bind(el)
 	};
 };
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /** 
 * Returns the x and y values from a MouseEvent or a svg group element (that gets 
 * its position via a css translate function).
@@ -2085,7 +2097,7 @@ function getTranslateValues(el) {
 		y: parseInt(values[1])
 	};
 }
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -3243,7 +3255,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":17,"ieee754":18}],17:[function(require,module,exports){
+},{"base64-js":18,"ieee754":19}],18:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -3365,7 +3377,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
