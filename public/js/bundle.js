@@ -1827,15 +1827,19 @@ var deleteNode = function(e) {
 	nodes.delete(node.id);
 };
 
-var setActiveNode = function(e) {
-	var node = e.detail.node;
+var cancelSelections = function() {
 	// TODO: clear event listeners from current active node.
 	activeNodes.forEach(function(n) {
 		n.classList.remove("active");		
 	});
 
 	activeNodes.length = 0;
+};
 
+var setActiveNode = function(e) {
+	var node = e.detail.node;
+
+	cancelSelections();
 	activeNodes.push(node);
 	node.classList.add("active");
 };
@@ -1855,6 +1859,7 @@ module.exports = function(el) {
 	$(el).on("key-down-delete", deletePressed)
 	$(el).on("mouse-select-node", setActiveNode);
 	$(el).on("mouse-select-nodes", addActiveNode);
+	$(el).on("mouse-cancel-selections", cancelSelections);
 };
 },{"./svg-maker":14,"./util":15,"./xy":16,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
 module.exports = function(el) {
@@ -2004,6 +2009,9 @@ module.exports = function(el) {
 					node: e.target.parentNode 
 				});
 		}
+
+		if (e.target.id === "canvas")
+			$(el).emit("mouse-cancel-selections");
 	});
 };
 },{"./util":15}],14:[function(require,module,exports){

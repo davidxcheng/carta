@@ -51,15 +51,19 @@ var deleteNode = function(e) {
 	nodes.delete(node.id);
 };
 
-var setActiveNode = function(e) {
-	var node = e.detail.node;
+var cancelSelections = function() {
 	// TODO: clear event listeners from current active node.
 	activeNodes.forEach(function(n) {
 		n.classList.remove("active");		
 	});
 
 	activeNodes.length = 0;
+};
 
+var setActiveNode = function(e) {
+	var node = e.detail.node;
+
+	cancelSelections();
 	activeNodes.push(node);
 	node.classList.add("active");
 };
@@ -79,4 +83,5 @@ module.exports = function(el) {
 	$(el).on("key-down-delete", deletePressed)
 	$(el).on("mouse-select-node", setActiveNode);
 	$(el).on("mouse-select-nodes", addActiveNode);
+	$(el).on("mouse-cancel-selections", cancelSelections);
 };

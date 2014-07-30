@@ -13,5 +13,8 @@ module.exports = function(el) {
 					node: e.target.parentNode 
 				});
 		}
+
+		if (e.target.id === "canvas")
+			$(el).emit("mouse-cancel-selections");
 	});
 };
