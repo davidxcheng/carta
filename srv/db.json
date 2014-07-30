@@ -1,1 +1,1 @@
-{"nodes":[{"id":"start","text":"Event","position":{"x":387,"y":120}},{"id":"member-notifications","text":"Member Notifications","position":{"x":219,"y":278}},{"id":"5c7db6b4-6ea6-4bee-92b4-26767a76ab91","text":"","position":{"x":456,"y":240}}],"relations":[{"node1":"start","node2":"member-notifications","text":""}]}
+{"nodes":[{"id":"start","text":"Event","position":{"x":387,"y":120}},{"id":"member-notifications","text":"Member Notifications","position":{"x":219,"y":278}}],"relations":[{"node1":"start","node2":"member-notifications","text":""}]}

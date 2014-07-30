@@ -1778,7 +1778,6 @@ require('es6-collections');
 
 var svgMaker = require("./svg-maker"),
 	$ = require('./util'),
-	xy = require('./xy'),
 	uuid = require('uuid'),
 	view = null,
 	nodes = new Map();
@@ -1794,15 +1793,11 @@ var addNode = function(e) {
 };
 
 var createNode = function(e) {
-	// TODO: Move to mouse-trapper
-	// if user double clicks canvas
 	if (this == e.target) {
-		var origo = xy(e);
-
 		var node = {
 			id: uuid.v4(),
 			text: "",
-			position: origo
+			position: e.detail.position
 		}
 
 		$(view).emit("ui-create-node", {
@@ -1836,15 +1831,17 @@ var cancelSelections = function() {
 	activeNodes.length = 0;
 };
 
-var setActiveNode = function(e) {
-	var node = e.detail.node;
-
+var setActiveNode = function(node) {
 	cancelSelections();
 	activeNodes.push(node);
 	node.classList.add("active");
+}
+
+var selectNode = function(e) {
+	setActiveNode(e.detail.node);
 };
 
-var addActiveNode = function(e) {
+var expandSelection = function(e) {
 	var node = e.detail.node;
 	activeNodes.push(node);
 	node.classList.add("active");
@@ -1855,13 +1852,13 @@ module.exports = function(el) {
 	$(el).on("x-node-added", addNode);
 	$(el).on("x-node-created", addNode);
 	$(el).on("x-node-deleted", deleteNode);
-	$(el).on("dblclick", createNode);
-	$(el).on("key-down-delete", deletePressed)
-	$(el).on("mouse-select-node", setActiveNode);
-	$(el).on("mouse-select-nodes", addActiveNode);
+	$(el).on("mouse-create-node", createNode);
+	$(el).on("mouse-select-node", selectNode);
+	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
+	$(el).on("key-down-delete", deletePressed)
 };
-},{"./svg-maker":14,"./util":15,"./xy":16,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
+},{"./svg-maker":14,"./util":15,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
 module.exports = function(el) {
 	var xy = require("./xy"),
 		elCoords = { x: 0, y: 0 }, 
@@ -1994,27 +1991,45 @@ module.exports = function() {
 	};
 }();
 },{"./util.js":15,"es6-collections":1}],13:[function(require,module,exports){
-var $ = require('./util');
+var $ = require('./util'),
+	xy = require('./xy'),
+	view = null;
+
+var singleClick = function(e) {
+	// Check if a node was clicked
+	if (e.target.parentNode.dataset.nodeId) {
+		if (e.shiftKey) {
+			$(view).emit("mouse-select-nodes", {
+				node: e.target.parentNode
+			});
+		}
+		else {
+			$(view).emit("mouse-select-node", {
+				node: e.target.parentNode
+			});
+		}
+	}
+
+	if (e.target.id === "canvas") {
+		$(view).emit("mouse-cancel-selections");		
+	}
+};
+
+var doubleClick = function(e) {
+	if (e.target.id === "canvas") {
+		$(view).emit("mouse-create-node", {
+			position: xy(e)
+		});
+	}
+};
 
 module.exports = function(el) {
-	$(el).on("click", function(e) {
-		// Check if a node was clicked
-		if (e.target.parentNode.dataset.nodeId) {
-			if (e.shiftKey)
-				$(el).emit("mouse-select-nodes", {
-					node: e.target.parentNode
-				});
-			else
-				$(el).emit("mouse-select-node", {
-					node: e.target.parentNode 
-				});
-		}
+	view = el;
 
-		if (e.target.id === "canvas")
-			$(el).emit("mouse-cancel-selections");
-	});
+	$(el).on("click", singleClick);
+	$(el).on("dblclick", doubleClick);
 };
-},{"./util":15}],14:[function(require,module,exports){
+},{"./util":15,"./xy":16}],14:[function(require,module,exports){
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 
