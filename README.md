@@ -13,5 +13,5 @@ make --directory=public/js/src all
 or:
 ```
 cd public/js/src
-watchify main.js -o ../bundle.js -v
+watchify main.js -o ../bundle.js -v --debug
 ```

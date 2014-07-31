@@ -14,8 +14,6 @@ var createSvgRepresentationOfNode = function (node) {
 		rect 	= document.createElementNS(svgNameSpace, "rect"),
 		text	= document.createElementNS(svgNameSpace, "text");
 
-console.log(defaults.node);
-
 	rect.classList.add("node");
 	rect.setAttribute("width", defaults.node.width.toString());
 	rect.setAttribute("height", defaults.node.heigth.toString());
