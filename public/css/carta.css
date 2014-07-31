@@ -6,6 +6,10 @@ body {
 	background: cyan;
 }
 
+.hide {
+	display: none !important;
+}
+
 #canvas {
 	position: fixed;
 	top: 0;
@@ -32,6 +36,12 @@ g.active .node {
 	font-weight: normal;
 	stroke: none;
 	fill: lime;
+}
+
+#text-edit {
+	position: absolute;
+	z-index: 10;
+	
 }
 
 .line {

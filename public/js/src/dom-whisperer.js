@@ -8,8 +8,15 @@ var svgMaker = require("./svg-maker"),
 	activeNodes = [];
 
 var addNode = function(e) {
-	view.appendChild(svgMaker.createSvgNode(e.detail.node));
-	nodes.set(e.detail.node.id, view.lastChild);
+	var node = e.detail.node;
+
+	// Center the node
+	var defaultSize = svgMaker.getDefaultNodeSize();
+	node.position.x = node.position.x - (defaultSize.width / 2);
+	node.position.y = node.position.y - (defaultSize.heigth / 2);
+
+	view.appendChild(svgMaker.createSvgNode(node));
+	nodes.set(node.id, view.lastChild);
 
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
@@ -55,6 +62,10 @@ var cancelSelections = function() {
 	activeNodes.length = 0;
 };
 
+var editNode = function(e) {
+	console.log("edit %s", e.detail.nodeId);
+};
+
 var setActiveNode = function(node) {
 	cancelSelections();
 	activeNodes.push(node);
@@ -80,5 +91,6 @@ module.exports = function(el) {
 	$(el).on("mouse-select-node", selectNode);
 	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
+	$(el).on("mouse-edit-node", editNode);
 	$(el).on("key-down-delete", deletePressed)
 };

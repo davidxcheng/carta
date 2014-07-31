@@ -1784,8 +1784,15 @@ var svgMaker = require("./svg-maker"),
 	activeNodes = [];
 
 var addNode = function(e) {
-	view.appendChild(svgMaker.createSvgNode(e.detail.node));
-	nodes.set(e.detail.node.id, view.lastChild);
+	var node = e.detail.node;
+
+	// Center the node
+	var defaultSize = svgMaker.getDefaultNodeSize();
+	node.position.x = node.position.x - (defaultSize.width / 2);
+	node.position.y = node.position.y - (defaultSize.heigth / 2);
+
+	view.appendChild(svgMaker.createSvgNode(node));
+	nodes.set(node.id, view.lastChild);
 
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
@@ -1831,6 +1838,10 @@ var cancelSelections = function() {
 	activeNodes.length = 0;
 };
 
+var editNode = function(e) {
+	console.log("edit %s", e.detail.nodeId);
+};
+
 var setActiveNode = function(node) {
 	cancelSelections();
 	activeNodes.push(node);
@@ -1856,6 +1867,7 @@ module.exports = function(el) {
 	$(el).on("mouse-select-node", selectNode);
 	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
+	$(el).on("mouse-edit-node", editNode);
 	$(el).on("key-down-delete", deletePressed)
 };
 },{"./svg-maker":14,"./util":15,"es6-collections":1,"uuid":6}],9:[function(require,module,exports){
@@ -2010,18 +2022,32 @@ var singleClick = function(e) {
 		}
 	}
 
-	if (e.target.id === "canvas") {
+	if (targetIsCanvas(e)) {
 		$(view).emit("mouse-cancel-selections");		
 	}
 };
 
 var doubleClick = function(e) {
-	if (e.target.id === "canvas") {
+	if (targetIsCanvas(e)) {
 		$(view).emit("mouse-create-node", {
 			position: xy(e)
 		});
 	}
+
+	if (targetIsNode(e)) {
+		$(view).emit("mouse-edit-node", {
+			nodeId: e.target.parentNode.dataset.nodeId
+		});
+	}
 };
+
+function targetIsCanvas(e) {
+	return e.target.id === "canvas";
+}
+
+function targetIsNode(e) {
+	return e.target.parentNode.dataset.nodeId !== undefined;
+}
 
 module.exports = function(el) {
 	view = el;
@@ -2033,15 +2059,24 @@ module.exports = function(el) {
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 
-function createSvgRepresentationOfNode(node) {
+var defaults = { 
+	node: { 
+		width: 120,
+		heigth: 60
+	}
+};
+
+var createSvgRepresentationOfNode = function (node) {
 	var frag 	= document.createDocumentFragment(),
 		group 	= document.createElementNS(svgNameSpace, "g"),
 		rect 	= document.createElementNS(svgNameSpace, "rect"),
 		text	= document.createElementNS(svgNameSpace, "text");
 
+console.log(defaults.node);
+
 	rect.classList.add("node");
-	rect.setAttribute("width", "120");
-	rect.setAttribute("height", "60");
+	rect.setAttribute("width", defaults.node.width.toString());
+	rect.setAttribute("height", defaults.node.heigth.toString());
 	rect.setAttribute("rx", "3");
 	rect.setAttribute("ry", "3");
 
@@ -2064,8 +2099,13 @@ function createSvgRepresentationOfNode(node) {
 	return frag;
 }
 
+var getDefaultNodeSize = function() {
+	return defaults.node;
+};
+
 module.exports = {
-	createSvgNode: createSvgRepresentationOfNode
+	createSvgNode: createSvgRepresentationOfNode,
+	getDefaultNodeSize: getDefaultNodeSize
 };
 },{"./drag":9}],15:[function(require,module,exports){
 module.exports = function(el) {

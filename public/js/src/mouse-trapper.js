@@ -17,18 +17,32 @@ var singleClick = function(e) {
 		}
 	}
 
-	if (e.target.id === "canvas") {
+	if (targetIsCanvas(e)) {
 		$(view).emit("mouse-cancel-selections");		
 	}
 };
 
 var doubleClick = function(e) {
-	if (e.target.id === "canvas") {
+	if (targetIsCanvas(e)) {
 		$(view).emit("mouse-create-node", {
 			position: xy(e)
 		});
 	}
+
+	if (targetIsNode(e)) {
+		$(view).emit("mouse-edit-node", {
+			nodeId: e.target.parentNode.dataset.nodeId
+		});
+	}
 };
+
+function targetIsCanvas(e) {
+	return e.target.id === "canvas";
+}
+
+function targetIsNode(e) {
+	return e.target.parentNode.dataset.nodeId !== undefined;
+}
 
 module.exports = function(el) {
 	view = el;
