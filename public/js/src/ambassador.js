@@ -28,16 +28,10 @@ var reportDeletedNode = function(e) {
 		});
 };
 
-var reportNodePosition = function(e) {
+var reportNodeUpdate = function(e) {
 	request
 		.patch("nodes/" + e.detail.nodeId)
-		.send([
-			{
-				op: "replace",
-				path: "/position",
-				value: e.detail.position
-			}
-		])
+		.send(e.detail.patch)
 		.end(function(err, res) {
 			//console.dir(res);
 		});
@@ -48,5 +42,5 @@ module.exports = function(el) {
 
 	$(view).on("x-node-created", reportNewNode);
 	$(view).on("x-node-deleted", reportDeletedNode);
-	$(view).on("ui-drag-end", reportNodePosition);
+	$(view).on("x-node-updated", reportNodeUpdate);
 };

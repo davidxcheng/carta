@@ -16,7 +16,7 @@ module.exports = function(el) {
 		el.removeEventListener("mousemove", move);
 
 		if (_dragging) {
-			el.dispatchEvent(new CustomEvent("ui-drag-end", {
+			el.dispatchEvent(new CustomEvent("ui-node-dragged", {
 				bubbles: true,
 				detail: {
 					nodeId: el.dataset.nodeId,

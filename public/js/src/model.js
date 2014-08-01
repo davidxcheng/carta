@@ -20,6 +20,22 @@ module.exports = function() {
 		});
 	};
 
+	var updateNodePosition = function(e) {
+		var node = nodes.get(e.detail.nodeId);
+		node.position = e.detail.position;
+		
+		$(view).emit("x-node-updated", {
+			nodeId: node.id,
+			patch: [
+				{
+					op: "replace",
+					path: "/position",
+					value: node.position
+				}
+			]
+		});
+	}
+
 	return {
 		init: function(db, el) {
 			view = el;
@@ -33,6 +49,7 @@ module.exports = function() {
 
 			$(view).on("ui-create-node", createNode);
 			$(view).on("ui-delete-node", removeNode);
+			$(view).on("ui-node-dragged", updateNodePosition);
 		}
 	};
 }();
