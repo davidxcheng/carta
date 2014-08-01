@@ -1,3 +1,8 @@
+/**
+* The Mouse Trapper listens to mouse events, tries to figure out the users
+* intent and emits more specific events that other modules acts on.
+*/
+
 var $ = require('./util'),
 	xy = require('./xy'),
 	view = null;

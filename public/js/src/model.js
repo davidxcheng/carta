@@ -1,3 +1,12 @@
+/**
+* The Model holds the master data for the client side. It listens to UI events
+* and emits events after updating the model. The events emitted triggers the 
+* Ambassador to report back to the server.
+* 
+* It should also listen for changes from the server (via the Ambassador) in a 
+* multi user scenario.
+**/
+
 require('es6-collections');
 var $ = require('./util.js');
 
@@ -23,7 +32,7 @@ module.exports = function() {
 	var updateNodePosition = function(e) {
 		var node = nodes.get(e.detail.nodeId);
 		node.position = e.detail.position;
-		
+
 		$(view).emit("x-node-updated", {
 			nodeId: node.id,
 			patch: [

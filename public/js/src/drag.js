@@ -1,6 +1,7 @@
+var xy = require("./xy");
+
 module.exports = function(el) {
-	var xy = require("./xy"),
-		elCoords = { x: 0, y: 0 }, 
+	var elCoords = { x: 0, y: 0 }, 
 		dragCoords = { x: 0, y: 0 },
 		_dragging = false;
 

@@ -1,3 +1,9 @@
+/**
+* The DOM Whisperer is responsible for talking to the DOM when things
+* changes. It listens for events emitted by other modules such as the Mouse 
+* Trapper and the Model.
+**/
+
 require('es6-collections');
 
 var svgMaker = require("./svg-maker"),
@@ -37,6 +43,10 @@ var createNode = function(e) {
 	}
 };
 
+/**
+* Sends a 'command' to the Model. The removing of DOM nodes is triggered by
+* the 'x-node-deleted' event.
+**/
 var deletePressed = function() {
 	activeNodes.forEach(function(node) {
 		$(view).emit("ui-delete-node", {
