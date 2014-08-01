@@ -2,6 +2,7 @@
 * Returns the x and y values from a MouseEvent or a svg group element (that gets 
 * its position via a css translate function).
 */
+
 module.exports = function(obj) {
 	// TODO: constructor.name is a ES6 feature currently not supported by IE
 	var ctor = obj.constructor.name;

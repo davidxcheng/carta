@@ -1,3 +1,8 @@
+/**
+* The SVG Maker is responsible for creating svg representations of
+* entities in the model.
+**/
+
 var svgNameSpace = "http://www.w3.org/2000/svg",
 	drag = require("./drag");
 

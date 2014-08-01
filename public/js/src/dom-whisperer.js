@@ -16,11 +16,6 @@ var svgMaker = require("./svg-maker"),
 var addNode = function(e) {
 	var node = e.detail.node;
 
-	// Center the node
-	var defaultSize = svgMaker.getDefaultNodeSize();
-	node.position.x = node.position.x - (defaultSize.width / 2);
-	node.position.y = node.position.y - (defaultSize.heigth / 2);
-
 	view.appendChild(svgMaker.createSvgNode(node));
 	nodes.set(node.id, view.lastChild);
 
@@ -35,7 +30,12 @@ var createNode = function(e) {
 			id: uuid.v4(),
 			text: "",
 			position: e.detail.position
-		}
+		};
+
+		// Center the node
+		var defaultSize = svgMaker.getDefaultNodeSize();
+		node.position.x = node.position.x - (defaultSize.width / 2);
+		node.position.y = node.position.y - (defaultSize.heigth / 2);
 
 		$(view).emit("ui-create-node", {
 			node: node
