@@ -8,10 +8,12 @@ require('es6-collections');
 
 var svgMaker = require("./svg-maker"),
 	$ = require('./util'),
+	xy = require('./xy'),
 	uuid = require('uuid'),
 	view = null,
 	nodes = new Map();
-	activeNodes = [];
+	activeNodes = [],
+	input = txt;
 
 var addNode = function(e) {
 	var node = e.detail.node;
@@ -32,7 +34,7 @@ var createNode = function(e) {
 			position: e.detail.position
 		};
 
-		// Center the node
+		// Make the point where the user clicked the center of the node.
 		var defaultSize = svgMaker.getDefaultNodeSize();
 		node.position.x = node.position.x - (defaultSize.width / 2);
 		node.position.y = node.position.y - (defaultSize.heigth / 2);
@@ -73,7 +75,11 @@ var cancelSelections = function() {
 };
 
 var editNode = function(e) {
-	console.log("edit %s", e.detail.nodeId);
+	var node = nodes.get(e.detail.nodeId);
+	txt.classList.remove("hide");
+	txt.setAttribute("transform", "translate(" + xy(node).x + ", " + xy(node).y + ")");
+	txt.setAttribute("top", xy(node).y);
+	console.dir(xy(node));
 };
 
 var setActiveNode = function(node) {

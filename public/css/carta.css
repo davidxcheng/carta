@@ -38,10 +38,9 @@ g.active .node {
 	fill: lime;
 }
 
-#text-edit {
+#txt {
 	position: absolute;
 	z-index: 10;
-	
 }
 
 .line {
