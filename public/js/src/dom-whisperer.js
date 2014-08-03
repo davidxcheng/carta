@@ -75,11 +75,18 @@ var cancelSelections = function() {
 };
 
 var editNode = function(e) {
-	var node = nodes.get(e.detail.nodeId);
+	var node = nodes.get(e.detail.nodeId),
+		position = xy(node);
+
+	console.dir(node.lastChild.textContent)
+	console.dir(txt)
+
+	txt.value = node.lastChild.textContent;
+	txt.style.left = (position.x + 2) + "px";
+	txt.style.top = (position.y + 18) + "px";
+
 	txt.classList.remove("hide");
-	txt.setAttribute("transform", "translate(" + xy(node).x + ", " + xy(node).y + ")");
-	txt.setAttribute("top", xy(node).y);
-	console.dir(xy(node));
+	txt.focus();
 };
 
 var setActiveNode = function(node) {
