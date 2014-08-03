@@ -78,9 +78,6 @@ var editNode = function(e) {
 	var node = nodes.get(e.detail.nodeId),
 		position = xy(node);
 
-	console.dir(node.lastChild.textContent)
-	console.dir(txt)
-
 	txt.value = node.lastChild.textContent;
 	txt.style.left = (position.x + 2) + "px";
 	txt.style.top = (position.y + 18) + "px";

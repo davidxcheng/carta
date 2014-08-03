@@ -26,8 +26,10 @@ var createSvgRepresentationOfNode = function (node) {
 	rect.setAttribute("ry", "3");
 
 	text.classList.add("node-text");
-	text.setAttribute("x", "12");
+	text.setAttribute("x", (defaults.node.width / 2).toString());
 	text.setAttribute("y", "34");
+	text.setAttribute("text-anchor", "middle");
+
 	text.textContent = node.text;
 
 	group.appendChild(rect);
