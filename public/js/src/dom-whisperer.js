@@ -75,15 +75,34 @@ var cancelSelections = function() {
 };
 
 var editNode = function(e) {
-	var node = nodes.get(e.detail.nodeId),
+	$(view).emit("ui-edit-mode", {
+		node: nodes.get(e.detail.nodeId)
+	});
+	/*var nodeId = e.detail.nodeId,
+		node = nodes.get(nodeId),
 		position = xy(node);
 
 	txt.value = node.lastChild.textContent;
 	txt.style.left = (position.x + 2) + "px";
-	txt.style.top = (position.y + 18) + "px";
+	txt.style.top = (position.y + 17) + "px";
+
+	$(txt).on("keydown", function(e) {
+
+		if(e.keyCode == 13) { // return
+			// update model
+			$(view).emit("ui-node-text-changed", { 
+				nodeId: nodeId,
+				newValue: txt.value 
+			});
+			// update ui
+			node.lastChild.textContent = txt.value;
+			// hide input
+			txt.classList.add("hide");
+		}
+	});
 
 	txt.classList.remove("hide");
-	txt.focus();
+	txt.focus();*/
 };
 
 var setActiveNode = function(node) {

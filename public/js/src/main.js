@@ -9,6 +9,7 @@ var request = require('superagent'),
 domWhisperer(canvas);
 mouseTrapper(canvas);
 ambassador(canvas);
+require('./keyboard-input').init(canvas);
 
 request.get('fake/db', function(res) {
 	var db = JSON.parse(res.text);

@@ -43,7 +43,24 @@ module.exports = function() {
 				}
 			]
 		});
-	}
+	};
+
+	var updateNodeText = function(e) {
+		var node = nodes.get(e.detail.nodeId);
+		console.dir(e)
+		node.text = e.detail.newValue;
+
+		$(view).emit("x-node-updated", {
+			nodeId: node.id,
+			patch: [
+				{
+					op: "replace",
+					path: "/text",
+					value: node.text
+				}
+			]
+		});
+	};
 
 	return {
 		init: function(db, el) {
@@ -59,6 +76,7 @@ module.exports = function() {
 			$(view).on("ui-create-node", createNode);
 			$(view).on("ui-delete-node", removeNode);
 			$(view).on("ui-node-dragged", updateNodePosition);
+			$(view).on("ui-node-text-changed", updateNodeText);
 		}
 	};
 }();
