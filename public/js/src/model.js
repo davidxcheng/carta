@@ -47,7 +47,6 @@ module.exports = function() {
 
 	var updateNodeText = function(e) {
 		var node = nodes.get(e.detail.nodeId);
-		console.dir(e)
 		node.text = e.detail.newValue;
 
 		$(view).emit("x-node-updated", {

@@ -1,5 +1,6 @@
 var $ = require('./util'),
 	xy = require('./xy'),
+	view = null,
 	targetNode = null;
 
 var assumeThePosition = function(e) {
@@ -15,23 +16,27 @@ var assumeThePosition = function(e) {
 };
 
 var keydown = function(e) {
-	console.dir(e);
-	console.dir(targetNode);
+	if (!targetNode)
+		return;
+
 	if(e.keyCode == 13) { // return
 		// update model
 		$(view).emit("ui-node-text-changed", { 
-			nodeId: targetNode.id,
+			nodeId: targetNode.dataset.nodeId,
 			newValue: txt.value 
 		});
 		// update ui
 		targetNode.lastChild.textContent = txt.value;
 		// hide input
 		txt.classList.add("hide");
+
+		targetNode = null;
 	}
 };
 
 module.exports = {
-	init: function(view) {
+	init: function(el) {
+		view = el;
 		$(view).on("ui-edit-mode", assumeThePosition),
 		$(txt).on("keydown", keydown)
 	}
