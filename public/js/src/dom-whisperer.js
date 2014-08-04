@@ -23,6 +23,9 @@ var addNode = function(e) {
 
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
+		$(view).emit("ui-edit-mode", {
+			node: view.lastChild
+		});
 	}
 };
 
