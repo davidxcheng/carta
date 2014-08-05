@@ -85,7 +85,13 @@ var editNode = function(e) {
 		position: xy(node),
 		currentValue: node.lastChild.textContent
 	});
+
+	node.lastChild.textContent = "";
 };
+
+var updateNodeText = function(e) {
+	nodes.get(e.detail.nodeId).lastChild.textContent = e.detail.newValue;
+}
 
 var setActiveNode = function(node) {
 	cancelSelections();
@@ -113,5 +119,6 @@ module.exports = function(el) {
 	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
 	$(el).on("mouse-edit-node", editNode);
-	$(el).on("key-down-delete", deletePressed)
+	$(el).on("keyboard-input-node-text-changed", updateNodeText);
+	$(el).on("key-down-delete", deletePressed);
 };

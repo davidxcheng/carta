@@ -1,9 +1,11 @@
 var $ = require('./util'),
 	xy = require('./xy'),
 	view = null,
-	valueBeforeEdit = null;
+	valueBeforeEdit = null,
+	nodeId = null;
 
 var assumeThePosition = function(e) {
+	nodeId = e.detail.nodeId;
 	valueBeforeEdit = e.detail.currentValue;
 	txt.value = e.detail.currentValue;
 
@@ -16,12 +18,12 @@ var assumeThePosition = function(e) {
 };
 
 var keydown = function(e) {
-	if (!targetNode)
+	if (!nodeId)
 		return;
 
 	if(e.keyCode == 13) { // return
-		$(view).emit("ui-node-text-changed", { 
-			nodeId: targetNode.dataset.nodeId,
+		$(view).emit("keyboard-input-node-text-changed", { 
+			nodeId: nodeId,
 			newValue: txt.value 
 		});
 		
