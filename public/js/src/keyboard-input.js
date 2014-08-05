@@ -1,13 +1,13 @@
 var $ = require('./util'),
 	xy = require('./xy'),
 	view = null,
-	targetNode = null;
+	valueBeforeEdit = null;
 
 var assumeThePosition = function(e) {
-	targetNode = e.detail.node;
-	position = xy(targetNode);
+	valueBeforeEdit = e.detail.currentValue;
+	txt.value = e.detail.currentValue;
 
-	txt.value = targetNode.lastChild.textContent;
+	var position = e.detail.position;
 	txt.style.left = (position.x + 2) + "px";
 	txt.style.top = (position.y + 17) + "px";
 
@@ -20,17 +20,16 @@ var keydown = function(e) {
 		return;
 
 	if(e.keyCode == 13) { // return
-		// update model
 		$(view).emit("ui-node-text-changed", { 
 			nodeId: targetNode.dataset.nodeId,
 			newValue: txt.value 
 		});
-		// update ui
-		targetNode.lastChild.textContent = txt.value;
+		
 		// hide input
 		txt.classList.add("hide");
+	}
+	else if(e.keyCode == 27) { // esc
 
-		targetNode = null;
 	}
 
 	e.stopPropagation();

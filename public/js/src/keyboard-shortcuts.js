@@ -11,11 +11,8 @@ var init = function(el) {
 	view = el;
 
 	$(document).on("keydown", function(e) {
-		console.clear();
-
 		switch(e.keyCode) {
 			case 46:
-				console.dir(e)
 				$(view).emit("key-down-delete");
 				break;
 		}

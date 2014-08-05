@@ -78,8 +78,12 @@ var cancelSelections = function() {
 };
 
 var editNode = function(e) {
+	var node = nodes.get(e.detail.nodeId);
+
 	$(view).emit("ui-edit-mode", {
-		node: nodes.get(e.detail.nodeId)
+		nodeId: e.detail.nodeId,
+		position: xy(node),
+		currentValue: node.lastChild.textContent
 	});
 };
 
