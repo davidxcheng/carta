@@ -32,6 +32,8 @@ var keydown = function(e) {
 
 		targetNode = null;
 	}
+
+	e.stopPropagation();
 };
 
 module.exports = {
