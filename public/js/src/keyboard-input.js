@@ -29,9 +29,16 @@ var keydown = function(e) {
 		
 		// hide input
 		txt.classList.add("hide");
+		nodeId = null;
 	}
 	else if(e.keyCode == 27) { // esc
+		$(view).emit("keyboard-input/cancelled", {
+			nodeId: nodeId,
+			valueBeforeEdit: valueBeforeEdit
+		});
 
+		nodeId = null;
+		txt.classList.add("hide");
 	}
 
 	e.stopPropagation();

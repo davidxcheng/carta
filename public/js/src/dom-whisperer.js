@@ -91,7 +91,11 @@ var editNode = function(e) {
 
 var updateNodeText = function(e) {
 	nodes.get(e.detail.nodeId).lastChild.textContent = e.detail.newValue;
-}
+};
+
+var editNodeCancelled = function(e) {
+	nodes.get(e.detail.nodeId).lastChild.textContent = e.detail.valueBeforeEdit;
+};
 
 var setActiveNode = function(node) {
 	cancelSelections();
@@ -120,5 +124,6 @@ module.exports = function(el) {
 	$(el).on("mouse-cancel-selections", cancelSelections);
 	$(el).on("mouse-edit-node", editNode);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
+	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("key-down-delete", deletePressed);
 };
