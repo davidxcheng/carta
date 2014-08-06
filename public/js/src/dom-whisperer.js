@@ -24,7 +24,9 @@ var addNode = function(e) {
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
 		$(view).emit("ui-edit-mode", {
-			node: view.lastChild
+			nodeId: node.nodeId,
+			position: node.position,
+			currentValue: ""
 		});
 	}
 };
@@ -125,5 +127,5 @@ module.exports = function(el) {
 	$(el).on("mouse-edit-node", editNode);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
-	$(el).on("key-down-delete", deletePressed);
+	$(el).on("keyboard-commands/delete", deletePressed);
 };

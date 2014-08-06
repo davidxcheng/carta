@@ -13,7 +13,7 @@ var init = function(el) {
 	$(document).on("keydown", function(e) {
 		switch(e.keyCode) {
 			case 46:
-				$(view).emit("key-down-delete");
+				$(view).emit("keyboard-commands/delete");
 				break;
 		}
 	});

@@ -1,49 +1,55 @@
-var xy = require("./xy");
+var xy = require('./xy'),
+	$ = require('./util'),
+	targetElement = null,
+	elCoords = null,
+	mouseCoords = null,
+	_dragging = false;
 
-module.exports = function(el) {
-	var elCoords = { x: 0, y: 0 }, 
-		dragCoords = { x: 0, y: 0 },
-		_dragging = false;
+var draggable = function(el) {
+	targetElement = el;
 
-	el.addEventListener("mousedown", function(e) {
+	$(el).on("mousedown", function(e) {
+		// Capture initial position of element and mouse pointer.
 		elCoords = xy(el);
-		dragCoords = xy(e);
+		mouseCoords = xy(e);
 
 		el.classList.add("grabbed");
-		el.addEventListener("mousemove", move);
+		$(el).on("mousemove", moveElement);
 	});
 
-	el.addEventListener("mouseup", function(e) {
-		el.removeEventListener("mousemove", move);
+	$(el).on("mouseup", function(e) {
+		// Remove event listener
+		el.removeEventListener("mousemove", moveElement);
 
 		if (_dragging) {
-			el.dispatchEvent(new CustomEvent("ui-node-dragged", {
-				bubbles: true,
-				detail: {
-					nodeId: el.dataset.nodeId,
-					position: xy(el)
-				}
-			}));
+			$(el).emit("ui-node-dragged", {
+				nodeId: el.dataset.nodeId,
+				position: xy(el)
+			});
 
 			_dragging = false;
 		}
 
 		el.classList.remove("grabbed");
-	});
-
-	var move = function(e) {
-		_dragging = true;
-
-		var deltaX = e.clientX - dragCoords.x, 
-			deltaY = e.clientY - dragCoords.y;
-		
-		elCoords.x += deltaX;
-		elCoords.y += deltaY;
-
-		el.setAttribute("transform", "translate(" 
-			+ elCoords.x + ", " 
-			+ elCoords.y + ")");
-
-		dragCoords = xy(e);
-	};
+	});	
 };
+
+var moveElement = function(e) {
+	_dragging = true;
+
+	var delta = {
+		x: e.clientX - mouseCoords.x, 
+		y: e.clientY - mouseCoords.y
+	};
+	
+	elCoords.x += delta.x;
+	elCoords.y += delta.y;
+
+	targetElement.setAttribute("transform", "translate(" 
+		+ elCoords.x + ", " 
+		+ elCoords.y + ")");
+
+	mouseCoords = xy(e);
+};
+
+module.exports = draggable;

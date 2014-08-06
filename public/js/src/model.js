@@ -16,6 +16,7 @@ module.exports = function() {
 
 	var createNode = function(e) {
 		var node = e.detail.node;
+
 		nodes.set(node.id, node);
 		$(view).emit("x-node-created", {
 			node: node	
