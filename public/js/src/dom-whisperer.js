@@ -115,6 +115,13 @@ var expandSelection = function(e) {
 	node.classList.add("active");
 };
 
+var moveSelectedNodes = function(e) {
+	activeNodes.forEach(function(n) {
+		console.log("move node %s", n.id);
+		console.dir(e.detail);
+	});
+}
+
 module.exports = function(el) {
 	view = el;
 	$(el).on("x-node-added", addNode);
@@ -124,6 +131,7 @@ module.exports = function(el) {
 	$(el).on("mouse-select-node", selectNode);
 	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
+	$(el).on("mouse-dragging", moveSelectedNodes);
 	$(el).on("mouse-edit-node", editNode);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
