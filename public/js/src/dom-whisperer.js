@@ -116,9 +116,14 @@ var expandSelection = function(e) {
 };
 
 var moveSelectedNodes = function(e) {
-	activeNodes.forEach(function(n) {
-		console.log("move node %s", n.id);
-		console.dir(e.detail);
+	var delta = e.detail.delta;
+
+	activeNodes.forEach(function(node) {
+		var nodePosition = xy(node);
+
+		node.setAttribute("transform", "translate(" 
+			+ (nodePosition.x += delta.x) + ", " 
+			+ (nodePosition.y += delta.y) + ")");
 	});
 }
 

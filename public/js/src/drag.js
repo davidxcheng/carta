@@ -22,7 +22,7 @@ var draggable = function(el) {
 		el.removeEventListener("mousemove", moveElement);
 
 		if (_dragging) {
-			$(el).emit("ui-node-dragged", {
+			$(el).emit("mouse-drag-ended", {
 				nodeId: el.dataset.nodeId,
 				position: xy(el)
 			});
@@ -42,12 +42,9 @@ var moveElement = function(e) {
 		y: e.clientY - mouseCoords.y
 	};
 	
-	elCoords.x += delta.x;
-	elCoords.y += delta.y;
-
-	targetElement.setAttribute("transform", "translate(" 
-		+ elCoords.x + ", " 
-		+ elCoords.y + ")");
+	$(canvas).emit("mouse-dragging", { 
+		delta: delta
+	});
 
 	mouseCoords = xy(e);
 };
