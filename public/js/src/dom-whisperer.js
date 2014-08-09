@@ -106,11 +106,15 @@ var setActiveNode = function(node) {
 }
 
 var selectNode = function(e) {
-	setActiveNode(nodes.get(e.detail.nodeId));
+	var node = nodes.get(e.detail.nodeId);
+
+	if (e.detail.shiftKey)
+		expandSelection(node);
+	else
+		setActiveNode(node);
 };
 
-var expandSelection = function(e) {
-	var node = e.detail.node;
+var expandSelection = function(node) {
 	activeNodes.push(node);
 	node.classList.add("active");
 };
@@ -133,7 +137,6 @@ module.exports = function(el) {
 	$(el).on("x-node-created", addNode);
 	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("mouse-create-node", createNode);
-	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
 	$(el).on("mouse-dragging", moveSelectedNodes);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
