@@ -4,8 +4,7 @@
 **/
 
 var svgNameSpace = "http://www.w3.org/2000/svg",
-	drag = require("./drag"),
-	nodeEvents = require("./nodeEvents");
+	nodeEvents = require("./node-events");
 
 var defaults = { 
 	node: { 

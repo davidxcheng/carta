@@ -1,5 +1,5 @@
 /**
-* The Mouse Trapper listens to mouse events, tries to figure out the users
+* The Mouse Trapper listens to mouse events from the canvas and tries to figure out the users
 * intent and emits more specific events that other modules acts on.
 */
 
@@ -7,25 +7,12 @@ var $ = require('./util'),
 	xy = require('./xy'),
 	view = null,
 	mouseIsDown = false,
-	dragBeginPosition = null;
+	dragging = false,
+	lastMousePosition = null;
 
 var mouseDown = function(e) {
 	mouseIsDown = true;
-	dragBeginPosition = xy(e);
-
-	// Check if a node was clicked
-	if (e.target.parentNode.dataset.nodeId) {
-		if (e.shiftKey) {
-			$(view).emit("mouse-select-nodes", {
-				node: e.target.parentNode
-			});
-		}
-		else {
-			$(view).emit("mouse-select-node", {
-				node: e.target.parentNode
-			});
-		}
-	}
+	lastMousePosition = xy(e);
 
 	if (targetIsCanvas(e)) {
 		$(view).emit("mouse-cancel-selections");		
@@ -33,21 +20,34 @@ var mouseDown = function(e) {
 };
 
 var mouseMove = function(e) {
-	if (mouseIsDown) {
+	if (mouseIsDown || e.shiftKey) {
+		dragging = true;
+
+		// If user shift-drags (without mousedown)
+		if (!lastMousePosition)
+			lastMousePosition = xy(e);
+
 		var delta = {
-			x: e.clientX - dragBeginPosition.x, 
-			y: e.clientY - dragBeginPosition.y
+			x: e.clientX - lastMousePosition.x, 
+			y: e.clientY - lastMousePosition.y
 		};
 
 		$(view).emit("mouse/drag", {
 			delta: delta
 		});
+
+		lastMousePosition = xy(e);
 	}
 };
 
 var mouseUp = function(e) {
 	mouseIsDown = false;
-	dragBeginPosition = null;
+	lastMousePosition = null;
+
+	if (dragging) {
+		$(view).emit("mouse/drag-end", {});
+		dragging = false;
+	}
 };
 
 var doubleClick = function(e) {
@@ -56,21 +56,10 @@ var doubleClick = function(e) {
 			position: xy(e)
 		});
 	}
-
-	if (targetIsNode(e)) {
-		$(view).emit("mouse-edit-node", {
-			nodeId: e.target.parentNode.dataset.nodeId
-		});
-	}
 };
-
 
 function targetIsCanvas(e) {
 	return e.target.id === "canvas";
-}
-
-function targetIsNode(e) {
-	return e.target.parentNode.dataset.nodeId !== undefined;
 }
 
 module.exports = function(el) {

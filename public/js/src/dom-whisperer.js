@@ -131,6 +131,15 @@ var moveSelectedNodes = function(e) {
 	});
 }
 
+var dragEnded = function() {
+	activeNodes.forEach(function(node) {
+		$(view).emit("view/node-moved", {
+			nodeId: node.dataset.nodeId,
+			position: xy(node)
+		});
+	});
+};
+
 module.exports = function(el) {
 	view = el;
 	$(el).on("x-node-added", addNode);
@@ -138,10 +147,11 @@ module.exports = function(el) {
 	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("mouse-create-node", createNode);
 	$(el).on("mouse-cancel-selections", cancelSelections);
-	$(el).on("mouse-dragging", moveSelectedNodes);
+	$(el).on("mouse/drag", moveSelectedNodes);
+	$(el).on("mouse/drag-end", dragEnded);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
-	$(el).on("keyboard-commands/delete", deletePressed);
+	$(el).on("keyboard-command/delete", deletePressed);
 	$(el).on("node/selected", selectNode);
 	$(el).on("node/begin-edit", editNode);
 };
