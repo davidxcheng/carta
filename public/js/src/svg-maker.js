@@ -4,7 +4,8 @@
 **/
 
 var svgNameSpace = "http://www.w3.org/2000/svg",
-	drag = require("./drag");
+	drag = require("./drag"),
+	nodeEvents = require("./nodeEvents");
 
 var defaults = { 
 	node: { 
@@ -38,8 +39,8 @@ var createSvgRepresentationOfNode = function (node) {
 	group.setAttribute("data-node-id", node.id);
 	group.setAttribute("transform", "translate(" + node.position.x + ", " + node.position.y + ")");
 
-	// Make element draggable
-	drag(group);
+	// Setup events for the node
+	nodeEvents.init(group, node.id);
 
 	frag.appendChild(group);
 

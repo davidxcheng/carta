@@ -106,7 +106,7 @@ var setActiveNode = function(node) {
 }
 
 var selectNode = function(e) {
-	setActiveNode(e.detail.node);
+	setActiveNode(nodes.get(e.detail.nodeId));
 };
 
 var expandSelection = function(e) {
@@ -133,12 +133,12 @@ module.exports = function(el) {
 	$(el).on("x-node-created", addNode);
 	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("mouse-create-node", createNode);
-	$(el).on("mouse-select-node", selectNode);
 	$(el).on("mouse-select-nodes", expandSelection);
 	$(el).on("mouse-cancel-selections", cancelSelections);
 	$(el).on("mouse-dragging", moveSelectedNodes);
-	$(el).on("mouse-edit-node", editNode);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("keyboard-commands/delete", deletePressed);
+	$(el).on("node/selected", selectNode);
+	$(el).on("node/begin-edit", editNode);
 };

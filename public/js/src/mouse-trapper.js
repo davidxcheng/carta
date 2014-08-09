@@ -5,9 +5,14 @@
 
 var $ = require('./util'),
 	xy = require('./xy'),
-	view = null;
+	view = null,
+	mouseIsDown = false,
+	dragBeginPosition = null;
 
-var singleClick = function(e) {
+var mouseDown = function(e) {
+	mouseIsDown = true;
+	dragBeginPosition = xy(e);
+
 	// Check if a node was clicked
 	if (e.target.parentNode.dataset.nodeId) {
 		if (e.shiftKey) {
@@ -27,6 +32,24 @@ var singleClick = function(e) {
 	}
 };
 
+var mouseMove = function(e) {
+	if (mouseIsDown) {
+		var delta = {
+			x: e.clientX - dragBeginPosition.x, 
+			y: e.clientY - dragBeginPosition.y
+		};
+
+		$(view).emit("mouse/drag", {
+			delta: delta
+		});
+	}
+};
+
+var mouseUp = function(e) {
+	mouseIsDown = false;
+	dragBeginPosition = null;
+};
+
 var doubleClick = function(e) {
 	if (targetIsCanvas(e)) {
 		$(view).emit("mouse-create-node", {
@@ -41,6 +64,7 @@ var doubleClick = function(e) {
 	}
 };
 
+
 function targetIsCanvas(e) {
 	return e.target.id === "canvas";
 }
@@ -52,6 +76,8 @@ function targetIsNode(e) {
 module.exports = function(el) {
 	view = el;
 
-	$(el).on("click", singleClick);
+	$(el).on("mousedown", mouseDown);
+	$(el).on("mouseup", mouseUp);
 	$(el).on("dblclick", doubleClick);
+	$(el).on("mousemove", mouseMove);
 };

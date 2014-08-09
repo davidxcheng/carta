@@ -14,15 +14,16 @@ var draggable = function(el) {
 		mouseCoords = xy(e);
 
 		el.classList.add("grabbed");
-		$(el).on("mousemove", moveElement);
+		
+		//$(el).on("mousemove", moveElement);
 	});
 
 	$(el).on("mouseup", function(e) {
 		// Remove event listener
-		el.removeEventListener("mousemove", moveElement);
+		//el.removeEventListener("mousemove", moveElement);
 
 		if (_dragging) {
-			$(el).emit("mouse-drag-ended", {
+			$(el).emit("ui-node-dragged", {
 				nodeId: el.dataset.nodeId,
 				position: xy(el)
 			});
