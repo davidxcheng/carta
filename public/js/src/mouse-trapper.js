@@ -69,4 +69,5 @@ module.exports = function(el) {
 	$(el).on("mouseup", mouseUp);
 	$(el).on("dblclick", doubleClick);
 	$(el).on("mousemove", mouseMove);
+	$(el).on("keyboard-command/shift-released", function() { if (dragging) mouseUp(); } );
 };

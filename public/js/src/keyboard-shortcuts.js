@@ -17,6 +17,14 @@ var init = function(el) {
 				break;
 		}
 	});
+
+	$(document).on("keyup", function(e) {
+		switch(e.keyCode) {
+			case 16:
+				$(view).emit("keyboard-command/shift-released");
+				break;
+		}
+	});
 };
 
 module.exports = {

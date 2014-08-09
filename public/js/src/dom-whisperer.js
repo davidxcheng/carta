@@ -12,7 +12,7 @@ var svgMaker = require("./svg-maker"),
 	uuid = require('uuid'),
 	view = null,
 	nodes = new Map();
-	activeNodes = [],
+	selectedNodes = [],
 	input = txt;
 
 var addNode = function(e) {
@@ -24,7 +24,7 @@ var addNode = function(e) {
 	if (e.type == "x-node-created") {
 		setActiveNode(view.lastChild);
 		$(view).emit("ui-edit-mode", {
-			nodeId: node.nodeId,
+			nodeId: node.id,
 			position: node.position,
 			currentValue: ""
 		});
@@ -55,12 +55,12 @@ var createNode = function(e) {
 * the 'x-node-deleted' event.
 **/
 var deletePressed = function() {
-	activeNodes.forEach(function(node) {
+	selectedNodes.forEach(function(node) {
 		$(view).emit("ui-delete-node", {
 			nodeId: node.dataset.nodeId
 		});
 	});
-	activeNodes.length = 0;
+	selectedNodes.length = 0;
 };
 
 var deleteNode = function(e) {
@@ -72,11 +72,11 @@ var deleteNode = function(e) {
 
 var cancelSelections = function() {
 	// TODO: clear event listeners from current active node.
-	activeNodes.forEach(function(n) {
+	selectedNodes.forEach(function(n) {
 		n.classList.remove("active");		
 	});
 
-	activeNodes.length = 0;
+	selectedNodes.length = 0;
 };
 
 var editNode = function(e) {
@@ -101,7 +101,7 @@ var editNodeCancelled = function(e) {
 
 var setActiveNode = function(node) {
 	cancelSelections();
-	activeNodes.push(node);
+	selectedNodes.push(node);
 	node.classList.add("active");
 }
 
@@ -115,14 +115,23 @@ var selectNode = function(e) {
 };
 
 var expandSelection = function(node) {
-	activeNodes.push(node);
+	selectedNodes.push(node);
 	node.classList.add("active");
 };
+
+var mouseDrag = function(e) {
+	if (nothingIsSelected()){
+		// begin/expand selection
+		console.log("nada");		
+	}
+	else
+		moveSelectedNodes(e);
+}
 
 var moveSelectedNodes = function(e) {
 	var delta = e.detail.delta;
 
-	activeNodes.forEach(function(node) {
+	selectedNodes.forEach(function(node) {
 		var nodePosition = xy(node);
 
 		node.setAttribute("transform", "translate(" 
@@ -132,13 +141,17 @@ var moveSelectedNodes = function(e) {
 }
 
 var dragEnded = function() {
-	activeNodes.forEach(function(node) {
+	selectedNodes.forEach(function(node) {
 		$(view).emit("view/node-moved", {
 			nodeId: node.dataset.nodeId,
 			position: xy(node)
 		});
 	});
 };
+
+function nothingIsSelected() {
+	return selectedNodes.length == 0;
+}
 
 module.exports = function(el) {
 	view = el;
@@ -147,7 +160,7 @@ module.exports = function(el) {
 	$(el).on("x-node-deleted", deleteNode);
 	$(el).on("mouse-create-node", createNode);
 	$(el).on("mouse-cancel-selections", cancelSelections);
-	$(el).on("mouse/drag", moveSelectedNodes);
+	$(el).on("mouse/drag", mouseDrag);
 	$(el).on("mouse/drag-end", dragEnded);
 	$(el).on("keyboard-input-node-text-changed", updateNodeText);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
