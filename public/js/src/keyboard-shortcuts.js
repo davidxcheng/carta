@@ -19,9 +19,10 @@ var init = function(el) {
 	});
 
 	$(document).on("keyup", function(e) {
+		console.dir(e)
 		switch(e.keyCode) {
-			case 16:
-				$(view).emit("keyboard-command/shift-released");
+			case 18:
+				$(view).emit("keyboard-command/alt-released");
 				break;
 		}
 	});

@@ -20,7 +20,7 @@ var mouseDown = function(e) {
 };
 
 var mouseMove = function(e) {
-	if (mouseIsDown || e.shiftKey) {
+	if (mouseIsDown || e.altKey) {
 		dragging = true;
 
 		// If user shift-drags (without mousedown)
@@ -69,5 +69,5 @@ module.exports = function(el) {
 	$(el).on("mouseup", mouseUp);
 	$(el).on("dblclick", doubleClick);
 	$(el).on("mousemove", mouseMove);
-	$(el).on("keyboard-command/shift-released", function() { if (dragging) mouseUp(); } );
+	$(el).on("keyboard-command/alt-released", function() { if (dragging) mouseUp(); } );
 };
