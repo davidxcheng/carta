@@ -11,6 +11,7 @@ var $ = require('./util'),
 	lastMousePosition = null;
 
 var mouseDown = function(e) {
+	console.dir(e)
 	mouseIsDown = true;
 	lastMousePosition = xy(e);
 

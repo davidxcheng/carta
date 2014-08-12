@@ -38,6 +38,17 @@ g.active .node {
 	fill: lime;
 }
 
+.socket {
+	stroke: yellow;
+	stroke-width: 3;
+	fill: black;
+	opacity: 0;
+}
+
+g.active .socket {
+	opacity: .9;
+}
+
 #txt {
 	position: absolute;
 	opacity: 1;
