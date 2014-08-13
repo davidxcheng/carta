@@ -42,7 +42,7 @@ var createNode = function(e) {
 		// Make the point where the user clicked the center of the node.
 		var defaultSize = svgMaker.getDefaultNodeSize();
 		node.position.x = node.position.x - (defaultSize.width / 2);
-		node.position.y = node.position.y - (defaultSize.heigth / 2);
+		node.position.y = node.position.y - (defaultSize.height / 2);
 
 		$(view).emit("ui-create-node", {
 			node: node
@@ -92,7 +92,9 @@ var editNode = function(e) {
 };
 
 var updateNodeText = function(e) {
-	nodes.get(e.detail.nodeId).lastChild.textContent = e.detail.newValue;
+	nodes.get(e.detail.nodeId)
+		.querySelectorAll("text")[0]
+		.textContent = e.detail.newValue;
 };
 
 var editNodeCancelled = function(e) {
