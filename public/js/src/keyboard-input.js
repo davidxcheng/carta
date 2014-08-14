@@ -22,7 +22,7 @@ var keydown = function(e) {
 		return;
 
 	if(e.keyCode == 13) { // return
-		$(view).emit("keyboard-input-node-text-changed", { 
+		$(view).emit("keyboard-input/submit", { 
 			nodeId: nodeId,
 			newValue: txt.value 
 		});
@@ -44,10 +44,15 @@ var keydown = function(e) {
 	e.stopPropagation();
 };
 
+var blur = function(e) {
+	txt.classList.add("hide");
+};
+
 module.exports = {
 	init: function(el) {
 		view = el;
 		$(view).on("ui-edit-mode", assumeThePosition),
-		$(txt).on("keydown", keydown)
+		$(txt).on("keydown", keydown),
+		$(txt).on("blur", blur)
 	}
 };

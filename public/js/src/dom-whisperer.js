@@ -164,7 +164,7 @@ module.exports = function(el) {
 	$(el).on("mouse-cancel-selections", cancelSelections);
 	$(el).on("mouse/drag", mouseDrag);
 	$(el).on("mouse/drag-end", dragEnded);
-	$(el).on("keyboard-input-node-text-changed", updateNodeText);
+	$(el).on("keyboard-input/submit", updateNodeText);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("keyboard-command/delete", deletePressed);
 	$(el).on("node/selected", selectNode);

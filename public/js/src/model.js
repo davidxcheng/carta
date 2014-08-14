@@ -76,7 +76,7 @@ module.exports = function() {
 			$(view).on("ui-create-node", createNode);
 			$(view).on("ui-delete-node", removeNode);
 			$(view).on("view/node-moved", updateNodePosition);
-			$(view).on("keyboard-input-node-text-changed", updateNodeText);
+			$(view).on("keyboard-input/submit", updateNodeText);
 		}
 	};
 }();
