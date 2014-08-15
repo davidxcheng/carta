@@ -14,6 +14,12 @@ var init = function(nodeElement, nodeId) {
 			nodeId: nodeId
 		});
 	});
+
+	var sockets = nodeElement.querySelectorAll(".socket");
+	
+	$(sockets[0]).on("click", function(e) {
+		console.dir(e)
+	});
 };
 
 module.exports = {
