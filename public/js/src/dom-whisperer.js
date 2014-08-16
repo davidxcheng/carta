@@ -79,26 +79,29 @@ var cancelSelections = function() {
 	selectedNodes.length = 0;
 };
 
-var editNode = function(e) {
-	var node = nodes.get(e.detail.nodeId);
+var editNodeTitle = function(e) {
+	var node = nodes.get(e.detail.nodeId),
+		textBox = node.querySelector(".node-title");
 
 	$(view).emit("ui-edit-mode", {
 		nodeId: e.detail.nodeId,
 		position: xy(node),
-		currentValue: node.lastChild.textContent
+		currentValue: textBox.innerText
 	});
 
-	node.lastChild.textContent = "";
+	textBox.innerText = "";
 };
 
-var updateNodeText = function(e) {
+var updateNodeTitle = function(e) {
 	nodes.get(e.detail.nodeId)
-		.querySelectorAll("text")[0]
-		.textContent = e.detail.newValue;
+		.querySelector(".node-title")
+		.innerText = e.detail.newValue;
 };
 
 var editNodeCancelled = function(e) {
-	nodes.get(e.detail.nodeId).lastChild.textContent = e.detail.valueBeforeEdit;
+	nodes.get(e.detail.nodeId)
+		.querySelector(".node-title")
+		.innerText = e.detail.valueBeforeEdit;
 };
 
 var setActiveNode = function(node) {
@@ -164,9 +167,9 @@ module.exports = function(el) {
 	$(el).on("mouse-cancel-selections", cancelSelections);
 	$(el).on("mouse/drag", mouseDrag);
 	$(el).on("mouse/drag-end", dragEnded);
-	$(el).on("keyboard-input/submit", updateNodeText);
+	$(el).on("keyboard-input/submit", updateNodeTitle);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("keyboard-command/delete", deletePressed);
 	$(el).on("node/selected", selectNode);
-	$(el).on("node/begin-edit", editNode);
+	$(el).on("node/begin-edit", editNodeTitle);
 };

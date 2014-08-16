@@ -11,7 +11,7 @@ var assumeThePosition = function(e) {
 
 	var position = e.detail.position;
 	txt.style.left = (position.x + 2) + "px";
-	txt.style.top = (position.y + 17) + "px";
+	txt.style.top = (position.y + 18) + "px";
 
 	txt.classList.remove("hide");
 	txt.focus();

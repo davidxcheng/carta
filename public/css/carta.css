@@ -32,7 +32,7 @@ g.active .node {
 	stroke: yellow;
 }
 
-.node-text {
+.node-title {
 	color: lime;
 	font-family: courier;
 	font-weight: bold;

@@ -37,7 +37,7 @@ var createSvgRepresentationOfNode = function (node) {
 	htmlHost.setAttribute("y", 0);
 	htmlHost.setAttribute("width", defaults.node.width);
 	htmlHost.setAttribute("height", defaults.node.height);
-	textBox.classList.add("node-text");
+	textBox.classList.add("node-title");
 	textBox.innerText = node.text;
 	htmlHost.appendChild(textBox);
 
