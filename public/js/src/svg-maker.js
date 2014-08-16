@@ -17,7 +17,8 @@ var createSvgRepresentationOfNode = function (node) {
 	var frag 		= document.createDocumentFragment(),
 		group 		= document.createElementNS(svgNameSpace, "g"),
 		rect 		= document.createElementNS(svgNameSpace, "rect"),
-		text		= document.createElementNS(svgNameSpace, "text"),
+		htmlHost	= document.createElementNS(svgNameSpace, "foreignObject"),
+		textBox = document.createElement("div"),
 		socketTop	= document.createElementNS(svgNameSpace, "rect"),
 		socketRight	= document.createElementNS(svgNameSpace, "rect"),
 		socketBottom	= document.createElementNS(svgNameSpace, "rect"),
@@ -31,11 +32,14 @@ var createSvgRepresentationOfNode = function (node) {
 	rect.setAttribute("rx", "3");
 	rect.setAttribute("ry", "3");
 
-	text.classList.add("node-text");
-	text.setAttribute("x", (defaults.node.width / 2).toString());
-	text.setAttribute("y", "34");
-	text.setAttribute("text-anchor", "middle");
-	text.textContent = node.text;
+	// Insert at 
+	htmlHost.setAttribute("x", 0);
+	htmlHost.setAttribute("y", 0);
+	htmlHost.setAttribute("width", defaults.node.width);
+	htmlHost.setAttribute("height", defaults.node.height);
+	textBox.classList.add("node-text");
+	textBox.innerText = node.text;
+	htmlHost.appendChild(textBox);
 
 	sockets.forEach(function(socket) {
 		socket.classList.add("socket");
@@ -56,7 +60,7 @@ var createSvgRepresentationOfNode = function (node) {
 	socketLeft.setAttribute("y", (defaults.node.height / 2) - 3);
 
 	group.appendChild(rect);
-	group.appendChild(text);
+	group.appendChild(htmlHost);
 	group.appendChild(socketTop);
 	group.appendChild(socketRight);
 	group.appendChild(socketBottom);

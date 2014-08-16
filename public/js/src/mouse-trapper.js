@@ -23,7 +23,8 @@ var mouseMove = function(e) {
 	if (mouseIsDown || e.altKey) {
 		dragging = true;
 
-		// If user shift-drags (without mousedown)
+		// If the user alt-drags (a.k.a. floats) we need to set lastMousePosition
+		// at the beginning of that action.
 		if (!lastMousePosition)
 			lastMousePosition = xy(e);
 

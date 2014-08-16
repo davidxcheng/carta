@@ -16,10 +16,12 @@ var init = function(nodeElement, nodeId) {
 	});
 
 	var sockets = nodeElement.querySelectorAll(".socket");
-	
-	$(sockets[0]).on("click", function(e) {
-		console.dir(e)
-	});
+
+	for(var i = 0; i < sockets.length; i++) {
+		$(sockets[i]).on("click", function(e) {
+			console.dir(e)
+		});
+	}
 };
 
 module.exports = {
