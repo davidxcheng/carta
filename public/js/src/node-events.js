@@ -18,8 +18,16 @@ var init = function(nodeElement, nodeId) {
 	var sockets = nodeElement.querySelectorAll(".socket");
 
 	for(var i = 0; i < sockets.length; i++) {
-		$(sockets[i]).on("click", function(e) {
-			console.dir(e)
+		$(sockets[i]).on("mousedown", function(e) {
+			$(nodeElement).emit("node/socket-selected", {
+				socket: e.target
+			});
+		});
+
+		$(sockets[i]).on("mouseup", function(e) {
+			$(nodeElement).emit("node/socket-deselected", {
+				socket: e.target
+			});
 		});
 	}
 };

@@ -13,6 +13,7 @@ var svgMaker = require("./svg-maker"),
 	view = null,
 	nodes = new Map();
 	selectedNodes = [],
+	selectedSocket = null,
 	input = txt;
 
 var addNode = function(e) {
@@ -119,6 +120,16 @@ var selectNode = function(e) {
 		setActiveNode(node);
 };
 
+var selectSocket = function(e) {
+	selectedSocket = e.detail.socket;
+	selectedSocket.classList.add("active");
+}
+
+var deselectSocket = function(e) {
+	selectedSocket = null;
+	e.detail.socket.classList.remove("active");
+}
+
 var expandSelection = function(node) {
 	selectedNodes.push(node);
 	node.classList.add("active");
@@ -129,8 +140,13 @@ var mouseDrag = function(e) {
 		// begin/expand selection
 		console.log("nada");		
 	}
-	else
-		moveSelectedNodes(e);
+	else {
+		if (selectedSocket) {
+
+		}
+		else
+			moveSelectedNodes(e);		
+	}
 }
 
 var moveSelectedNodes = function(e) {
@@ -171,5 +187,6 @@ module.exports = function(el) {
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("keyboard-command/delete", deletePressed);
 	$(el).on("node/selected", selectNode);
+	$(el).on("node/socket-deselected", deselectSocket);
 	$(el).on("node/begin-edit", editNodeTitle);
 };
