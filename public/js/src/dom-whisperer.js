@@ -72,7 +72,7 @@ var deleteNode = function(e) {
 };
 
 var arrowPressed = function(e) {
-	moveSelectedNodes(e);
+	moveSelectedNodes(e, true);
 }
 
 var cancelSelections = function() {
@@ -149,11 +149,11 @@ var mouseDrag = function(e) {
 
 		}
 		else
-			moveSelectedNodes(e);		
+			moveSelectedNodes(e, false);		
 	}
 }
 
-var moveSelectedNodes = function(e) {
+var moveSelectedNodes = function(e, emitEvent) {
 	var delta = e.detail.delta;
 
 	selectedNodes.forEach(function(node) {
@@ -162,6 +162,13 @@ var moveSelectedNodes = function(e) {
 		node.setAttribute("transform", "translate(" 
 			+ (nodePosition.x += delta.x) + ", " 
 			+ (nodePosition.y += delta.y) + ")");
+
+		if (emitEvent) {
+			$(view).emit("view/node-moved", {
+				nodeId: node.dataset.nodeId,
+				position: xy(node)
+			});
+		}
 	});
 }
 
