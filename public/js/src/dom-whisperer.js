@@ -71,6 +71,10 @@ var deleteNode = function(e) {
 	nodes.delete(node.id);
 };
 
+var arrowPressed = function(e) {
+	moveSelectedNodes(e);
+}
+
 var cancelSelections = function() {
 	// TODO: clear event listeners from current active node.
 	selectedNodes.forEach(function(n) {
@@ -186,6 +190,8 @@ module.exports = function(el) {
 	$(el).on("keyboard-input/submit", updateNodeTitle);
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("keyboard-command/delete", deletePressed);
+	$(el).on("keyboard-command/up", arrowPressed);
+	$(el).on("keyboard-command/down", arrowPressed);
 	$(el).on("node/selected", selectNode);
 	$(el).on("node/socket-deselected", deselectSocket);
 	$(el).on("node/begin-edit", editNodeTitle);
