@@ -16,7 +16,12 @@ var init = function(el) {
 				$(view).emit("keyboard-command/delete");
 				break;
 			case 37:
-				$(view).emit("keyboard-command/left");
+				$(view).emit("keyboard-command/left", {
+					delta:  {
+						x: -4,
+						y: 0
+					}}
+				);
 				break;
 			case 38:
 				$(view).emit("keyboard-command/up", {
@@ -27,7 +32,12 @@ var init = function(el) {
 				});
 				break;
 			case 39:
-				$(view).emit("keyboard-command/right");
+				$(view).emit("keyboard-command/right", {
+					delta:  {
+						x: 4,
+						y: 0
+					}
+				});
 				break;
 			case 40:
 				$(view).emit("keyboard-command/down", {

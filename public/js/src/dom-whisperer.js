@@ -191,7 +191,9 @@ module.exports = function(el) {
 	$(el).on("keyboard-input/cancelled", editNodeCancelled);
 	$(el).on("keyboard-command/delete", deletePressed);
 	$(el).on("keyboard-command/up", arrowPressed);
+	$(el).on("keyboard-command/right", arrowPressed);
 	$(el).on("keyboard-command/down", arrowPressed);
+	$(el).on("keyboard-command/left", arrowPressed);
 	$(el).on("node/selected", selectNode);
 	$(el).on("node/socket-deselected", deselectSocket);
 	$(el).on("node/begin-edit", editNodeTitle);
