@@ -127,11 +127,15 @@ var selectNode = function(e) {
 var selectSocket = function(e) {
 	selectedSocket = e.detail.socket;
 	selectedSocket.classList.add("active");
+
+	console.dir(selectedSocket);
 }
 
 var deselectSocket = function(e) {
 	selectedSocket = null;
 	e.detail.socket.classList.remove("active");
+
+	console.dir(selectedSocket);
 }
 
 var expandSelection = function(node) {
@@ -202,6 +206,7 @@ module.exports = function(el) {
 	$(el).on("keyboard-command/down", arrowPressed);
 	$(el).on("keyboard-command/left", arrowPressed);
 	$(el).on("node/selected", selectNode);
+	$(el).on("node/socket-selected", selectSocket);
 	$(el).on("node/socket-deselected", deselectSocket);
 	$(el).on("node/begin-edit", editNodeTitle);
 };
