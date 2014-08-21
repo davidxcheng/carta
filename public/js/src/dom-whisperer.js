@@ -183,6 +183,11 @@ var dragEnded = function() {
 			position: xy(node)
 		});
 	});
+
+	if (selectedSocket) {
+		selectedSocket.classList.remove("active");
+		selectedSocket = null;
+	}
 };
 
 function nothingIsSelected() {
