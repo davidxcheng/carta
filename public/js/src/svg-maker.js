@@ -77,6 +77,18 @@ var createSvgRepresentationOfNode = function (node) {
 	return frag;
 }
 
+var createSvgRepresentationOfRelationship = function(rel) {
+	var frag	= document.createDocumentFragment(),
+		group 	= document.createElementNS(svgNameSpace, "g"),
+		path	= document.createElementNS(svgNameSpace, "path");
+
+	path.setAttribute("d", "M"
+		+ rel.from.x + "")
+
+	frag.appendChild(path);
+	return frag;	
+};
+
 var getDefaultNodeSize = function() {
 	return defaults.node;
 };
