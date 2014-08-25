@@ -14,9 +14,10 @@ module.exports = function(obj) {
 		}
 	}
 
-	if (ctor == "SVGGElement") {
+	if (ctor == "SVGGElement")
 		return getTranslateValues(obj);
-	}
+	else if (ctor == "SVGRectElement")
+		return getXyValues(obj)
 }
 
 function getTranslateValues(el) {
@@ -32,4 +33,11 @@ function getTranslateValues(el) {
 		x: parseInt(values[0]),
 		y: parseInt(values[1])
 	};
+}
+
+function getXyValues(el) {
+	return {
+		x: el.getAttribute("x"),
+		y: el.getAttribute("y")
+	}
 }
