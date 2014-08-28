@@ -77,15 +77,26 @@ var createSvgRepresentationOfNode = function (node) {
 	return frag;
 }
 
-var createSvgRepresentationOfRelationship = function(rel) {
+var createSvgRepresentationOfRelationship = function(from, to) {
 	var frag	= document.createDocumentFragment(),
 		group 	= document.createElementNS(svgNameSpace, "g"),
 		path	= document.createElementNS(svgNameSpace, "path");
+		
+	group.setAttribute("transform", "translate(" + from.x + ", " + from.y + ")");
 
-	path.setAttribute("d", "M"
-		+ rel.from.x + "")
+	var cubicBezier = [
+		// m = MoveTo relative to group
+		"m", 0, 0,
+		// c = CurveTo using cubic bezier. 
+		// Lower-case 'c' makes all control points relative to M. 'C' = absolute 
+		"c", 0, 0, 0, 0, to.x, to.y
+	];
 
-	frag.appendChild(path);
+	path.classList.add("line");
+	path.setAttribute("d", cubicBezier.join(" "))
+
+	group.appendChild(path);
+	frag.appendChild(group);
 	return frag;	
 };
 
@@ -95,5 +106,6 @@ var getDefaultNodeSize = function() {
 
 module.exports = {
 	createSvgNode: createSvgRepresentationOfNode,
+	createSvgRelationship: createSvgRepresentationOfRelationship,
 	getDefaultNodeSize: getDefaultNodeSize
 };

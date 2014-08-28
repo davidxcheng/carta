@@ -34,7 +34,8 @@ var mouseMove = function(e) {
 		};
 
 		$(view).emit("mouse/drag", {
-			delta: delta
+			delta: delta,
+			mousePosition: xy(e)
 		});
 
 		lastMousePosition = xy(e);

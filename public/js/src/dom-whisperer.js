@@ -14,6 +14,7 @@ var svgMaker = require("./svg-maker"),
 	nodes = new Map();
 	selectedNodes = [],
 	selectedSocket = null,
+	evolvingRelationship = null,
 	input = txt;
 
 var addNode = function(e) {
@@ -127,8 +128,6 @@ var selectNode = function(e) {
 var selectSocket = function(e) {
 	selectedSocket = e.detail.socket;
 	selectedSocket.classList.add("active");
-
-	console.dir(selectedSocket);
 }
 
 var deselectSocket = function(e) {
@@ -146,14 +145,24 @@ var expandSelection = function(node) {
 var mouseDrag = function(e) {
 	if (nothingIsSelected()){
 		// begin/expand selection
-		console.log("nada");		
+		return;
+	}
+	
+	if (selectedSocket) {
+		var to = e.detail.delta;
+
+		if (!evolvingRelationship) {
+			// User initiated creation of new relationship
+			view.appendChild(svgMaker.createSvgRelationship(e.detail.mousePosition, to));
+			evolvingRelationship = view.lastChild.querySelector(".line");
+			console.dir(evolvingRelationship)
+		}
+		else {
+			updateEvolvingingRelationship(to);
+		}
 	}
 	else {
-		if (selectedSocket) {
-
-		}
-		else
-			moveSelectedNodes(e, false);		
+		moveSelectedNodes(e, false);		
 	}
 }
 
@@ -176,6 +185,15 @@ var moveSelectedNodes = function(e, emitEvent) {
 	});
 }
 
+var updateEvolvingingRelationship = function(to) {
+	var pathSegments = evolvingRelationship.animatedPathSegList;
+		bezier = pathSegments.getItem(1);
+
+	bezier.x = bezier.x + to.x;
+	bezier.y = bezier.y + to.y;
+	//evolvingRelationship.setAttribute("d", cubicBezier.join(" "));
+};
+
 var dragEnded = function() {
 	selectedNodes.forEach(function(node) {
 		$(view).emit("view/node-moved", {
@@ -191,7 +209,7 @@ var dragEnded = function() {
 };
 
 function nothingIsSelected() {
-	return selectedNodes.length == 0;
+	return selectedNodes.length == 0 && selectedSocket == null;
 }
 
 module.exports = function(el) {
