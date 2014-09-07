@@ -18,4 +18,4 @@ watchify main.js -o ../bundle.js -v --debug
 
 ## Current State (Moi Jouni:-)
 You can create nodes. And delete nodes! You can also move them around and edit the title.
-That is all. I'm working on drwing lines between the nodes.
+That is all. I'm working on drawing lines between the nodes.
