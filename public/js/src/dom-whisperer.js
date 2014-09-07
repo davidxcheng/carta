@@ -24,6 +24,7 @@ var addNode = function(e) {
 	nodes.set(node.id, view.lastChild);
 
 	if (e.type == "x-node-created") {
+		// Go straight into edit mode when creating a new node
 		setActiveNode(view.lastChild);
 		$(view).emit("ui-edit-mode", {
 			nodeId: node.id,
@@ -133,8 +134,6 @@ var selectSocket = function(e) {
 var deselectSocket = function(e) {
 	selectedSocket = null;
 	e.detail.socket.classList.remove("active");
-
-	console.dir(selectedSocket);
 }
 
 var expandSelection = function(node) {
@@ -155,7 +154,6 @@ var mouseDrag = function(e) {
 			// User initiated creation of new relationship
 			view.appendChild(svgMaker.createSvgRelationship(e.detail.mousePosition, to));
 			evolvingRelationship = view.lastChild.querySelector(".line");
-			console.dir(evolvingRelationship)
 		}
 		else {
 			updateEvolvingingRelationship(to);
@@ -165,6 +163,12 @@ var mouseDrag = function(e) {
 		moveSelectedNodes(e, false);		
 	}
 }
+
+
+var mouseOverNode = function(e) {
+	var node = nodes.get(e.detail.nodeId);
+	console.dir(node);
+};
 
 var moveSelectedNodes = function(e, emitEvent) {
 	var delta = e.detail.delta;
@@ -191,6 +195,8 @@ var updateEvolvingingRelationship = function(to) {
 
 	bezier.x = bezier.x + to.x;
 	bezier.y = bezier.y + to.y;
+
+	//console.dir(bezier)
 	//evolvingRelationship.setAttribute("d", cubicBezier.join(" "));
 };
 
@@ -229,6 +235,7 @@ module.exports = function(el) {
 	$(el).on("keyboard-command/down", arrowPressed);
 	$(el).on("keyboard-command/left", arrowPressed);
 	$(el).on("node/selected", selectNode);
+	$(el).on("node/mouse-over", mouseOverNode);
 	$(el).on("node/socket-selected", selectSocket);
 	$(el).on("node/socket-deselected", deselectSocket);
 	$(el).on("node/begin-edit", editNodeTitle);

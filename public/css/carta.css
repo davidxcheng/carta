@@ -54,8 +54,8 @@ g.active .socket {
 	opacity: .9;
 }
 
-.socket.active {
-	stroke: red;
+.socket:hover {
+	transform: scale(1);
 }
 
 #txt {

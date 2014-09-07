@@ -15,6 +15,12 @@ var init = function(nodeElement, nodeId) {
 		});
 	});
 
+	$(nodeElement.querySelector(".node")).on("mouseover", function(e) {
+		$(nodeElement).emit("node/mouse-over", {
+			nodeId: nodeId
+		})
+	});
+
 	var sockets = nodeElement.querySelectorAll(".socket");
 
 	for(var i = 0; i < sockets.length; i++) {
