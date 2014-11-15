@@ -1,58 +1,60 @@
 var $ = require('./util'),
-	xy = require('./xy'),
-	view = null,
-	valueBeforeEdit = null,
-	nodeId = null;
+	xy = require('./xy');
 
-var assumeThePosition = function(e) {
-	nodeId = e.detail.nodeId;
-	valueBeforeEdit = e.detail.currentValue;
-	txt.value = e.detail.currentValue;
+function KeyboardInput(el, inputSelector) {
 
-	var position = e.detail.position;
-	txt.style.left = (position.x + 2) + "px";
-	txt.style.top = (position.y + 18) + "px";
-
-	txt.classList.remove("hide");
-	txt.focus();
-};
-
-var keydown = function(e) {
-	if (!nodeId)
-		return;
-
-	if(e.keyCode == 13) { // return
-		$(view).emit("keyboard-input/submit", { 
-			nodeId: nodeId,
-			newValue: txt.value 
-		});
-		
-		// hide input
-		txt.classList.add("hide");
+	var ui = el,
+		inputEl = document.querySelector(inputSelector),
+		valueBeforeEdit = null,
 		nodeId = null;
-	}
-	else if(e.keyCode == 27) { // esc
-		$(view).emit("keyboard-input/cancelled", {
-			nodeId: nodeId,
-			valueBeforeEdit: valueBeforeEdit
-		});
 
-		nodeId = null;
-		txt.classList.add("hide");
-	}
+	this._assumeThePosition = function(e) {
+		nodeId = e.detail.nodeId;
+		valueBeforeEdit = e.detail.currentValue;
+		inputEl.value = e.detail.currentValue;
 
-	e.stopPropagation();
-};
+		var position = e.detail.position;
+		inputEl.style.left = (position.x + 2) + "px";
+		inputEl.style.top = (position.y + 18) + "px";
 
-var blur = function(e) {
-	txt.classList.add("hide");
-};
+		inputEl.classList.remove("hide");
+		inputEl.focus();		
+	};
 
-module.exports = {
-	init: function(el) {
-		view = el;
-		$(view).on("ui-edit-mode", assumeThePosition),
-		$(txt).on("keydown", keydown),
-		$(txt).on("blur", blur)
-	}
-};
+	this._keydown = function(e) {
+		if (!nodeId)
+			return;
+
+		if(e.keyCode == 13) { // return
+			$(ui).emit("keyboard-input/submit", { 
+				nodeId: nodeId,
+				newValue: inputEl.value 
+			});
+			
+			inputEl.classList.add("hide");
+			nodeId = null;
+		}
+		else if(e.keyCode == 27) { // esc
+			$(ui).emit("keyboard-input/cancelled", {
+				nodeId: nodeId,
+				valueBeforeEdit: valueBeforeEdit
+			});
+
+			nodeId = null;
+			inputEl.classList.add("hide");
+		}
+
+		e.stopPropagation();
+	};
+
+	this._blur = function(e) {
+		inputEl.classList.add("hide");
+	};
+
+	$(ui).on("ui-edit-mode", this._assumeThePosition),
+	$(inputEl).on("keydown", this._keydown),
+	$(inputEl).on("blur", this._blur)
+}
+
+
+module.exports = KeyboardInput;

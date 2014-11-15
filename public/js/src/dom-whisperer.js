@@ -14,8 +14,7 @@ var svgMaker = require("./svg-maker"),
 	nodes = new Map();
 	selectedNodes = [],
 	selectedSocket = null,
-	evolvingRelationship = null,
-	input = txt;
+	evolvingRelationship = null;
 
 var addNode = function(e) {
 	var node = e.detail.node;

@@ -11,7 +11,7 @@ body {
 	display: none !important;
 }
 
-#canvas {
+.canvas {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -58,7 +58,7 @@ g.active .socket {
 	transform: scale(1);
 }
 
-#txt {
+.input-box {
 	position: absolute;
 	opacity: 1;
 	border: none;
@@ -69,7 +69,7 @@ g.active .socket {
 	font: normal 1em courier;
 }
 
-#txt:focus {
+.input-box:focus {
 	outline: none;
 }
 
