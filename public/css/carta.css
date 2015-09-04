@@ -23,8 +23,8 @@ body {
 g { cursor: pointer; }
 
 .node {
-	stroke: magenta;
-	stroke-width: 4;
+	stroke: cornflowerblue;
+	stroke-width: 2;
 	fill: rgba(0,0,0,.9);
 }
 
@@ -45,9 +45,13 @@ g.active .node {
 
 .socket {
 	stroke: orange;
-	stroke-width: 3;
+	stroke-width: 2;
 	fill: black;
 	opacity: 0;
+}
+
+.socket.target {
+	stroke: red;
 }
 
 g.active .socket {
@@ -77,6 +81,10 @@ g.active .socket {
 	fill: none;
 	stroke: black;
 	stroke-width: 3;
+}
+
+.line.pending {
+	stroke-dasharray: 10, 5;
 }
 
 .grabbed {
