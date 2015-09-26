@@ -46,8 +46,15 @@ var mouseUp = function(e) {
 	mouseIsDown = false;
 	lastMousePosition = null;
 
+	var pos = xy(e);
+
 	if (dragging) {
-		$(view).emit("mouse/drag-end", {});
+		var targetEl = document.elementFromPoint(pos.x, pos.y);
+
+		$(view).emit("mouse/drag-end", {
+			position: pos,
+			targetEl: targetEl 
+		});
 		dragging = false;
 	}
 };

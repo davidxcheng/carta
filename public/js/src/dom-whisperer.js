@@ -15,6 +15,7 @@ var svgMaker = require("./svg-maker"),
 	selectedNodes = [],
 	selectedSocket = null,
 	evolvingRelationship = null;
+	_targetSocket = null;
 
 var addNode = function(e) {
 	var node = e.detail.node;
@@ -128,12 +129,41 @@ var selectNode = function(e) {
 var selectSocket = function(e) {
 	selectedSocket = e.detail.socket;
 	selectedSocket.classList.add("active");
+};
+
+var socketMouseUp = function(e) {
+console.dir(e);	
+	if (!selectedSocket)
+		return;
+
+
+	if (e.detail.socket === selectedSocket)
+		deselectSocket();
+
+	console.log("yay!");
+};
+
+var socketMouseOver = function(e) {
+	if (evolvingRelationship) {
+		if (_targetSocket)
+			_targetSocket.classList.remove("target");
+
+		_targetSocket = e.detail.socket;
+		_targetSocket.classList.add("target");
+	}
+};
+
+var socketMouseOut = function(e) {
+	if (evolvingRelationship) {
+		_targetSocket.classList.remove("target");
+		_targetSocket = null;
+	}
 }
 
-var deselectSocket = function(e) {
+var deselectSocket = function() {
+	selectedSocket.classList.remove("active");
 	selectedSocket = null;
-	e.detail.socket.classList.remove("active");
-}
+};
 
 var expandSelection = function(node) {
 	selectedNodes.push(node);
@@ -153,6 +183,7 @@ var mouseDrag = function(e) {
 			// User initiated creation of new relationship
 			view.appendChild(svgMaker.createSvgRelationship(e.detail.mousePosition, to));
 			evolvingRelationship = view.lastChild.querySelector(".line");
+			evolvingRelationship.classList.add("pending");
 		}
 		else {
 			updateEvolvingingRelationship(to);
@@ -163,10 +194,18 @@ var mouseDrag = function(e) {
 	}
 }
 
-
 var mouseOverNode = function(e) {
-	var node = nodes.get(e.detail.nodeId);
-	console.dir(node);
+	if (evolvingRelationship) {
+		var node = nodes.get(e.detail.nodeId);
+		node.classList.add("active");
+	}
+};
+
+var mouseOutNode = function(e) {
+	if (evolvingRelationship) {
+		var node = nodes.get(e.detail.nodeId);
+		node.classList.remove("active");
+	}
 };
 
 var moveSelectedNodes = function(e, emitEvent) {
@@ -188,18 +227,18 @@ var moveSelectedNodes = function(e, emitEvent) {
 	});
 }
 
-var updateEvolvingingRelationship = function(to) {
+var updateEvolvingingRelationship = function(delta) {
 	var pathSegments = evolvingRelationship.animatedPathSegList;
 		bezier = pathSegments.getItem(1);
 
-	bezier.x = bezier.x + to.x;
-	bezier.y = bezier.y + to.y;
+	bezier.x = bezier.x + delta.x;
+	bezier.y = bezier.y + delta.y;
 
 	//console.dir(bezier)
 	//evolvingRelationship.setAttribute("d", cubicBezier.join(" "));
 };
 
-var dragEnded = function() {
+var dragEnded = function(e) {
 	selectedNodes.forEach(function(node) {
 		$(view).emit("view/node-moved", {
 			nodeId: node.dataset.nodeId,
@@ -207,9 +246,22 @@ var dragEnded = function() {
 		});
 	});
 
+	if (evolvingRelationship) {
+		console.dir(e.detail.position);
+		console.dir(e.detail.targetEl);
+	}
+
 	if (selectedSocket) {
 		selectedSocket.classList.remove("active");
 		selectedSocket = null;
+
+		if (_targetSocket)
+			console.log("create rel!");
+		else {
+			var elLine = view.lastChild.querySelector(".line");
+			elLine.parentNode.removeChild(elLine);
+			evolvingRelationship = null;
+		}
 	}
 };
 
@@ -235,7 +287,10 @@ module.exports = function(el) {
 	$(el).on("keyboard-command/left", arrowPressed);
 	$(el).on("node/selected", selectNode);
 	$(el).on("node/mouse-over", mouseOverNode);
+	$(el).on("node/mouse-out", mouseOutNode);
 	$(el).on("node/socket-selected", selectSocket);
-	$(el).on("node/socket-deselected", deselectSocket);
+	$(el).on("node/socket-mouseup", socketMouseUp);
+	$(el).on("node/socket-mouseover", socketMouseOver);
+	$(el).on("node/socket-mouseout", socketMouseOut);
 	$(el).on("node/begin-edit", editNodeTitle);
 };

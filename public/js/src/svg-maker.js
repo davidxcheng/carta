@@ -32,7 +32,8 @@ var createSvgRepresentationOfNode = function (node) {
 	rect.setAttribute("rx", "3");
 	rect.setAttribute("ry", "3");
 
-	// Insert at 
+	// Insert at
+	htmlHost.classList.add("node-html-host");
 	htmlHost.setAttribute("x", 0);
 	htmlHost.setAttribute("y", 0);
 	htmlHost.setAttribute("width", defaults.node.width);

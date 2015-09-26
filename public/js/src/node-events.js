@@ -15,8 +15,14 @@ var init = function(nodeElement, nodeId) {
 		});
 	});
 
-	$(nodeElement.querySelector(".node")).on("mouseover", function(e) {
+	$(nodeElement.querySelectorAll(".node, .node-html-host, .node-title")).on("mouseover", function(e) {
 		$(nodeElement).emit("node/mouse-over", {
+			nodeId: nodeId
+		})
+	});
+
+	$(nodeElement.querySelector(".node")).on("mouseout", function(e) {
+		$(nodeElement).emit("node/mouse-out", {
 			nodeId: nodeId
 		})
 	});
@@ -31,7 +37,19 @@ var init = function(nodeElement, nodeId) {
 		});
 
 		$(sockets[i]).on("mouseup", function(e) {
-			$(nodeElement).emit("node/socket-deselected", {
+			$(nodeElement).emit("node/socket-mouseup", {
+				socket: e.target
+			});
+		});
+
+		$(sockets[i]).on("mouseenter", function(e) {
+			$(nodeElement).emit("node/socket-mouseover", {
+				socket: e.target
+			});
+		});
+
+		$(sockets[i]).on("mouseleave", function(e) {
+			$(nodeElement).emit("node/socket-mouseout", {
 				socket: e.target
 			});
 		});
