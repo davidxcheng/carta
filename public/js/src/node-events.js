@@ -6,7 +6,7 @@ var init = function(nodeElement, nodeId) {
 		$(nodeElement).emit("node/selected", {
 			nodeId: nodeId,
 			shiftKey: e.shiftKey
-		})
+		});
 	});
 
 	$(nodeElement).on("dblclick", function(e) {
@@ -18,7 +18,7 @@ var init = function(nodeElement, nodeId) {
 	$(nodeElement.querySelectorAll(".node, .node-html-host, .node-title")).on("mouseover", function(e) {
 		$(nodeElement).emit("node/mouse-over", {
 			nodeId: nodeId
-		})
+		});
 	});
 
 	$(nodeElement.querySelector(".node")).on("mouseout", function(e) {

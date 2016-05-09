@@ -11,14 +11,14 @@ module.exports = function(obj) {
 		return {
 			x: obj.clientX,
 			y: obj.clientY
-		}
+		};
 	}
 
 	if (ctor == "SVGGElement")
 		return getTranslateValues(obj);
 	else if (ctor == "SVGRectElement")
-		return getXyValues(obj)
-}
+		return getXyValues(obj);
+};
 
 function getTranslateValues(el) {
 	var str = el.getAttribute("transform");
@@ -39,5 +39,5 @@ function getXyValues(el) {
 	return {
 		x: el.getAttribute("x"),
 		y: el.getAttribute("y")
-	}
+	};
 }

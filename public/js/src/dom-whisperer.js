@@ -5,6 +5,7 @@
 **/
 
 require('es6-collections');
+var pathFinder = require("./path-finder");
 
 var svgMaker = require("./svg-maker"),
 	$ = require('./util'),
@@ -60,7 +61,7 @@ var createNode = function(e) {
 var deletePressed = function() {
 	selectedNodes.forEach(function(node) {
 		$(view).emit("ui-delete-node", {
-			nodeId: node.dataset.nodeId
+			nodeId: node.attributes["data-node-id"].value
 		});
 	});
 	selectedNodes.length = 0;
@@ -75,7 +76,7 @@ var deleteNode = function(e) {
 
 var arrowPressed = function(e) {
 	moveSelectedNodes(e, true);
-}
+};
 
 var cancelSelections = function() {
 	// TODO: clear event listeners from current active node.
@@ -115,7 +116,7 @@ var setActiveNode = function(node) {
 	cancelSelections();
 	selectedNodes.push(node);
 	node.classList.add("active");
-}
+};
 
 var selectNode = function(e) {
 	var node = nodes.get(e.detail.nodeId);
@@ -131,38 +132,10 @@ var selectSocket = function(e) {
 	selectedSocket.classList.add("active");
 };
 
-var socketMouseUp = function(e) {
-console.dir(e);	
-	if (!selectedSocket)
-		return;
-
-
-	if (e.detail.socket === selectedSocket)
-		deselectSocket();
-
-	console.log("yay!");
-};
-
-var socketMouseOver = function(e) {
-	if (evolvingRelationship) {
-		if (_targetSocket)
-			_targetSocket.classList.remove("target");
-
-		_targetSocket = e.detail.socket;
-		_targetSocket.classList.add("target");
-	}
-};
-
-var socketMouseOut = function(e) {
-	if (evolvingRelationship) {
-		_targetSocket.classList.remove("target");
-		_targetSocket = null;
-	}
-}
-
 var deselectSocket = function() {
 	selectedSocket.classList.remove("active");
 	selectedSocket = null;
+	e.detail.socket.classList.remove("active");
 };
 
 var expandSelection = function(node) {
@@ -177,28 +150,28 @@ var mouseDrag = function(e) {
 	}
 	
 	if (selectedSocket) {
-		var to = e.detail.delta;
+		var to = {
+			x: e.detail.mousePosition.x,
+			y: e.detail.mousePosition.y,
+		};
 
 		if (!evolvingRelationship) {
 			// User initiated creation of new relationship
-			view.appendChild(svgMaker.createSvgRelationship(e.detail.mousePosition, to));
-			evolvingRelationship = view.lastChild.querySelector(".line");
-			evolvingRelationship.classList.add("pending");
+			var from = pathFinder.getPointOfConnection(selectedSocket);
+			view.appendChild(svgMaker.createSvgRelationship(from, to));
+			evolvingRelationship = view.lastChild.querySelector(".evolving.line");
 		}
 		else {
-			updateEvolvingingRelationship(to);
+			updateEvolvingingRelationship(evolvingRelationship, selectedSocket, to);
 		}
 	}
 	else {
 		moveSelectedNodes(e, false);		
 	}
-}
+};
 
 var mouseOverNode = function(e) {
-	if (evolvingRelationship) {
-		var node = nodes.get(e.detail.nodeId);
-		node.classList.add("active");
-	}
+	var node = nodes.get(e.detail.nodeId);
 };
 
 var mouseOutNode = function(e) {
@@ -214,18 +187,18 @@ var moveSelectedNodes = function(e, emitEvent) {
 	selectedNodes.forEach(function(node) {
 		var nodePosition = xy(node);
 
-		node.setAttribute("transform", "translate(" 
-			+ (nodePosition.x += delta.x) + ", " 
-			+ (nodePosition.y += delta.y) + ")");
+		node.setAttribute("transform", "translate(" +
+			(nodePosition.x += delta.x) + ", " +
+			(nodePosition.y += delta.y) + ")");
 
 		if (emitEvent) {
 			$(view).emit("view/node-moved", {
-				nodeId: node.dataset.nodeId,
+				nodeId: node.attributes["data-node-id"].value,
 				position: xy(node)
 			});
 		}
 	});
-}
+};
 
 var updateEvolvingingRelationship = function(delta) {
 	var pathSegments = evolvingRelationship.animatedPathSegList;
@@ -241,7 +214,7 @@ var updateEvolvingingRelationship = function(delta) {
 var dragEnded = function(e) {
 	selectedNodes.forEach(function(node) {
 		$(view).emit("view/node-moved", {
-			nodeId: node.dataset.nodeId,
+			nodeId: node.attributes["data-node-id"].value,
 			position: xy(node)
 		});
 	});
@@ -266,7 +239,7 @@ var dragEnded = function(e) {
 };
 
 function nothingIsSelected() {
-	return selectedNodes.length == 0 && selectedSocket == null;
+	return selectedNodes.length === 0 && selectedSocket === null;
 }
 
 module.exports = function(el) {

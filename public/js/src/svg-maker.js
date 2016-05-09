@@ -4,16 +4,21 @@
 **/
 
 var svgNameSpace = "http://www.w3.org/2000/svg",
-	nodeEvents = require("./node-events");
+	nodeEvents = require("./node-events"),
+	pathFinder = require("./path-finder");
 
 var defaults = { 
 	node: { 
 		width: 120,
 		height: 60
-	}
+	},
+	socket: {
+		width: 6,
+		height: 6
+	},
 };
 
-var createSvgRepresentationOfNode = function (node) {
+var createSvgRepresentationOfNode = function(node) {
 	var frag 		= document.createDocumentFragment(),
 		group 		= document.createElementNS(svgNameSpace, "g"),
 		rect 		= document.createElementNS(svgNameSpace, "rect"),
@@ -44,21 +49,26 @@ var createSvgRepresentationOfNode = function (node) {
 
 	sockets.forEach(function(socket) {
 		socket.classList.add("socket");
-		socket.setAttribute("width", 6);
-		socket.setAttribute("height", 6);	
+		socket.setAttribute("width", defaults.socket.width);
+		socket.setAttribute("height", defaults.socket.width);	
 	});
 	
-	socketTop.setAttribute("x", (defaults.node.width / 2) - 3);
-	socketTop.setAttribute("y", -3);
+	socketTop.setAttribute("x", (defaults.node.width / 2) - (defaults.socket.width / 2));
+	socketTop.setAttribute("y", -(defaults.socket.height / 2));
+	// Chromium does not support dataset on Element, only on HtmlElement
+	socketTop.setAttribute("data-socket-direction", "up");
 
-	socketRight.setAttribute("x", defaults.node.width - 3);
-	socketRight.setAttribute("y", (defaults.node.height / 2) - 3);
+	socketRight.setAttribute("x", defaults.node.width - (defaults.socket.width / 2));
+	socketRight.setAttribute("y", (defaults.node.height / 2) - (defaults.socket.height / 2));
+	socketRight.setAttribute("data-socket-direction", "right");
 
-	socketBottom.setAttribute("x", (defaults.node.width/2) - 3);
-	socketBottom.setAttribute("y", defaults.node.height - 3);
+	socketBottom.setAttribute("x", (defaults.node.width / 2) - (defaults.socket.width / 2));
+	socketBottom.setAttribute("y", defaults.node.height - (defaults.socket.height / 2));
+	socketBottom.setAttribute("data-socket-direction", "down");
 
-	socketLeft.setAttribute("x", -3);
-	socketLeft.setAttribute("y", (defaults.node.height / 2) - 3);
+	socketLeft.setAttribute("x", -(defaults.socket.width / 2));
+	socketLeft.setAttribute("y", (defaults.node.height / 2) - (defaults.socket.height / 2));
+	socketLeft.setAttribute("data-socket-direction", "left");
 
 	group.appendChild(rect);
 	group.appendChild(htmlHost);
@@ -76,25 +86,23 @@ var createSvgRepresentationOfNode = function (node) {
 	frag.appendChild(group);
 
 	return frag;
-}
+};
 
-var createSvgRepresentationOfRelationship = function(from, to) {
+var createSvgRepresentationOfRelationship = function(from) {
 	var frag	= document.createDocumentFragment(),
 		group 	= document.createElementNS(svgNameSpace, "g"),
 		path	= document.createElementNS(svgNameSpace, "path");
 		
 	group.setAttribute("transform", "translate(" + from.x + ", " + from.y + ")");
 
-	var cubicBezier = [
+	path.classList.add("line", "evolving");
+
+	var d = [
 		// m = MoveTo relative to group
 		"m", 0, 0,
-		// c = CurveTo using cubic bezier. 
-		// Lower-case 'c' makes all control points relative to M. 'C' = absolute 
-		"c", 0, 0, 0, 0, to.x, to.y
 	];
 
-	path.classList.add("line");
-	path.setAttribute("d", cubicBezier.join(" "))
+	path.setAttribute("d", d.join(" "));
 
 	group.appendChild(path);
 	frag.appendChild(group);
