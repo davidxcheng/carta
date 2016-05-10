@@ -13,15 +13,49 @@ function dIsForDescription(fromSocket, to) {
 
     var socketDirection = _getSocketDirection(fromSocket);
 
-    if (/up|down/.test(socketDirection)) {
+    if (socketDirection === "up") {
         d.push("v" + delta.y);
+
+        if (delta.x < 0)
+            d.push("a 5,5 0 0, 0 -5,-5");
+        else
+            d.push("a 5,5 0 0, 1 5,-5");
+
         d.push("h" + delta.x);
     }
-    else {
+
+    if (socketDirection === "right") {
         d.push("h" + delta.x);
+        
+        if (delta.y < 0)
+            d.push("a 5,5 0 0, 0 5,-5");
+        else
+            d.push("a 5,5 0 0, 1 5,5");
+
         d.push("v" + delta.y);
     }
 
+    if (socketDirection === "down") {
+        d.push("v" + delta.y);
+        
+        if (delta.x < 0)
+            d.push("a 5,5 0 0, 1 -5,5");
+        else
+            d.push("a 5,5 0 0, 0 5,5");
+
+        d.push("h" + delta.x);
+    }
+
+    if (socketDirection === "left") {
+        d.push("h" + delta.x);
+        
+        if (delta.y < 0)
+            d.push("a 5,5 0 0, 1 -5,-5");
+        else
+            d.push("a 5,5 0 0, 0 -5,5");
+
+        d.push("v" + delta.y);
+    }
 
     return d.join(" ");
 }
@@ -48,9 +82,6 @@ function _getConnectionPoint(socket) {
         x: nodeOffset.x + socketOffset.x + pixelPushX,
         y: nodeOffset.y + socketOffset.y + pixelPushY
     };
-
-    console.dir(nodeOffset);
-    console.dir(startPosition)
 
     return startPosition;
 }
