@@ -15,7 +15,7 @@ var svgMaker = require("./svg-maker"),
 	nodes = new Map();
 	selectedNodes = [],
 	selectedSocket = null,
-	evolvingRelationship = null;
+	evolvingRelationship = null,
 	_targetSocket = null;
 
 var addNode = function(e) {
@@ -132,10 +132,38 @@ var selectSocket = function(e) {
 	selectedSocket.classList.add("active");
 };
 
+/* Weird shit begins here */
+var socketMouseUp = function(e) {
+	if (!selectedSocket)
+		return;
+
+	if (e.detail.socket === selectedSocket)
+		deselectSocket();
+
+};
+
+var socketMouseOver = function(e) {
+	if (evolvingRelationship) {
+		if (_targetSocket)
+			_targetSocket.classList.remove("target");
+
+		_targetSocket = e.detail.socket;
+		_targetSocket.classList.add("target");
+	}
+};
+
+var socketMouseOut = function(e) {
+	if (evolvingRelationship) {
+		_targetSocket.classList.remove("target");
+		_targetSocket = null;
+	}
+};
+/* Weird shit ends here */
+
+
 var deselectSocket = function() {
 	selectedSocket.classList.remove("active");
 	selectedSocket = null;
-	e.detail.socket.classList.remove("active");
 };
 
 var expandSelection = function(node) {
@@ -200,15 +228,8 @@ var moveSelectedNodes = function(e, emitEvent) {
 	});
 };
 
-var updateEvolvingingRelationship = function(delta) {
-	var pathSegments = evolvingRelationship.animatedPathSegList;
-		bezier = pathSegments.getItem(1);
-
-	bezier.x = bezier.x + delta.x;
-	bezier.y = bezier.y + delta.y;
-
-	//console.dir(bezier)
-	//evolvingRelationship.setAttribute("d", cubicBezier.join(" "));
+var updateEvolvingingRelationship = function(path, fromSocket, to) {
+	path.setAttribute("d", pathFinder.pathDescriptionGenerator(fromSocket, to));
 };
 
 var dragEnded = function(e) {

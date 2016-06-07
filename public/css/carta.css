@@ -23,7 +23,7 @@ body {
 g { cursor: pointer; }
 
 .node {
-	stroke: cornflowerblue;
+	stroke: magenta;
 	stroke-width: 2;
 	fill: rgba(0,0,0,.9);
 }
@@ -83,7 +83,7 @@ g.active .socket {
 	stroke-width: 3;
 }
 
-.line.pending {
+.line.evolving {
 	stroke-dasharray: 10, 5;
 }
 
